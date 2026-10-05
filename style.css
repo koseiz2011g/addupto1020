@@ -1,0 +1,1215 @@
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "Noto Sans JP",
+    sans-serif;
+  background: #f5f7fa;
+  color: #222;
+}
+
+body {
+  overflow-x: hidden;
+  touch-action: manipulation;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+button:active {
+  transform: scale(0.97);
+}
+
+
+/* =========================
+   共通画面
+========================= */
+
+#app {
+  width: 100%;
+  min-height: 100vh;
+}
+
+.screen {
+  display: none;
+  width: 100%;
+  min-height: 100vh;
+  padding: 20px 16px 80px;
+  text-align: center;
+}
+
+.screen.active {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
+/* =========================
+   タイトル
+========================= */
+
+h1 {
+  margin: 8px 0 20px;
+  font-size: clamp(26px, 7vw, 38px);
+  font-weight: 800;
+}
+
+
+/* =========================
+   メニュー
+========================= */
+
+.menu-illustration {
+  font-size: clamp(60px, 18vw, 100px);
+  margin: 10px 0 30px;
+}
+
+.main-button,
+.sub-button,
+.game-button {
+  border: none;
+  border-radius: 14px;
+  min-height: 52px;
+  padding: 10px 24px;
+  font-weight: 700;
+  transition: transform 0.1s ease;
+}
+
+.main-button {
+  width: min(88vw, 360px);
+  margin: 7px 0;
+  background: #2f80ed;
+  color: white;
+  font-size: 20px;
+}
+
+.sub-button {
+  width: min(80vw, 300px);
+  margin: 7px 0;
+  background: #e5e7eb;
+  color: #333;
+}
+
+.daily-record {
+  margin: 20px 0;
+  font-size: 19px;
+  line-height: 1.9;
+}
+
+.daily-record #win-loss {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+
+/* =========================
+   ゲーム画面
+========================= */
+
+#game-screen {
+  padding: 8px 8px 70px;
+  position: relative;
+  overflow: hidden;
+}
+
+.turn-area {
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#turn-display {
+  font-size: clamp(20px, 5vw, 28px);
+  font-weight: 800;
+}
+
+
+/* =========================
+   山札・墓地
+========================= */
+
+.deck-area {
+  width: min(90vw, 460px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 14px auto 16px;
+}
+
+.deck-box,
+.graveyard-box {
+  width: 70px;
+  height: 92px;
+  border-radius: 8px;
+  border: 2px solid #555;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+.deck-box {
+  background:
+    linear-gradient(45deg, transparent 46%, rgba(255,255,255,0.22) 47%, rgba(255,255,255,0.22) 53%, transparent 54%),
+    linear-gradient(-45deg, transparent 46%, rgba(255,255,255,0.22) 47%, rgba(255,255,255,0.22) 53%, transparent 54%),
+    #2868b2;
+  background-size: 16px 16px;
+  color: white;
+  box-shadow:
+    inset 0 0 0 4px rgba(255,255,255,0.75),
+    inset 0 0 0 7px #2868b2;
+}
+
+.graveyard-box {
+  cursor: pointer;
+}
+
+.card-stack-label {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+#deck-count {
+  margin-top: 5px;
+  font-size: 13px;
+}
+
+.grave-card-empty {
+  margin-top: 5px;
+  font-size: 28px;
+}
+
+
+/* =========================
+   カード共通
+========================= */
+
+.playing-card {
+  width: var(--card-width);
+  height: calc(var(--card-width) * 1.3333);
+  min-width: var(--card-width);
+  border-radius: 8px;
+  border: 1.5px solid #555;
+  background: white;
+  position: relative;
+  user-select: none;
+  touch-action: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.card-red {
+  color: #d62828;
+}
+
+.card-black {
+  color: #111;
+}
+
+
+/* =========================
+   上下の「数字＋マーク」
+   横並び
+========================= */
+
+.card-corner {
+  position: absolute;
+
+  font-weight: 900;
+  font-size: calc(var(--card-width) * 0.30);
+  line-height: 1;
+
+  /* 横並び */
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  /* 数字とマークの間隔 */
+  gap: calc(var(--card-width) * 0.025);
+}
+
+
+/* 右上 */
+
+.card-corner.top-right {
+  top: 5px;
+  right: 5px;
+}
+
+
+/* 左下 */
+
+.card-corner.bottom-left {
+  bottom: 5px;
+  left: 5px;
+
+  /* 下側は上下反転 */
+  transform: rotate(180deg);
+}
+
+
+/* =========================
+   上下のマーク
+========================= */
+
+.card-corner-suit {
+  font-size: calc(var(--card-width) * 0.30);
+  margin-top: 0;
+}
+
+
+/* =========================
+   中央マーク領域
+========================= */
+
+.card-center {
+  position: absolute;
+
+  /*
+   * 上下の数字を避けて
+   * 中央に広いスペースを確保
+   */
+  top: 25%;
+  bottom: 25%;
+  left: 8%;
+  right: 8%;
+
+  display: grid;
+  place-items: center;
+}
+
+
+
+/* =========================
+   中央マーク
+========================= */
+
+.pip-grid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--card-width) * 0.04);
+
+  width: max-content;
+  height: max-content;
+  margin: 0 auto;
+}
+
+.pip-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: calc(var(--card-width) * 0.035);
+
+  width: max-content;
+}
+
+.pip {
+  display: block;
+  font-size: calc(var(--card-width) * 0.13);
+  line-height: 1;
+}
+
+
+/* =========================
+   場札
+========================= */
+
+.field-area {
+  width: min(96vw, 600px);
+  display: grid;
+  grid-template-columns: repeat(4, var(--card-width));
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0 auto;
+  min-height: calc(var(--card-width) * 1.3333);
+}
+
+.field-slot {
+  position: relative;
+  min-width: 0;
+  height: calc(var(--card-width) * 1.3333 + var(--stack-extra));
+}
+
+.field-card-base {
+  position: relative;
+  z-index: 2;
+}
+
+
+/* =========================
+   セット
+========================= */
+
+.card-stack {
+  position: absolute;
+  top: calc(var(--card-width) * 1.3333 + 6px);
+  left: 0;
+  width: var(--card-width);
+  z-index: 10;
+}
+
+.stacked-card {
+  position: absolute;
+  left: 0;
+  width: var(--card-width);
+}
+
+.stack-total {
+  position: absolute;
+  top: calc(30% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+  font-size: calc(var(--card-width) * 0.25);
+  font-weight: 900;
+  pointer-events: none;
+  text-shadow: 0 1px 3px white;
+}
+
+.stack-total.valid {
+  color: #1d70d6;
+}
+
+.stack-total.over {
+  color: #d62828;
+}
+
+.field-slot.target-valid {
+  filter: drop-shadow(0 0 7px rgba(47, 128, 237, 0.7));
+}
+
+.field-slot.target-valid::after {
+  content: "↓";
+  position: absolute;
+  left: 50%;
+  top: calc(var(--card-width) * 1.3333 + 1px);
+  transform: translateX(-50%);
+  color: #ed2f48;
+  font-size: 32px;
+  font-weight: bold;
+  text-shadow: 0 1px 4px rgba(47, 128, 237, 0.35);
+  z-index: 50;
+}
+
+
+/* =========================
+   手札
+========================= */
+
+.hand-area {
+  width: min(96vw, 600px);
+  display: grid;
+  grid-template-columns: repeat(5, var(--card-width));
+  justify-content: space-between;
+  gap: 8px;
+  margin: var(--hand-gap) auto 12px;
+  min-height: calc(var(--card-width) * 1.3333);
+
+  /* 手札を置くエリア */
+  background: #3f8f68;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-radius: 12px;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+.hand-card {
+  position: relative;
+  z-index: 100;
+  touch-action: none;
+}
+
+.hand-card.new-card {
+  box-shadow:
+    0 0 0 3px rgba(255, 213, 79, 0.9),
+    0 0 14px rgba(255, 213, 79, 0.8);
+}
+
+.dragging {
+  position: fixed !important;
+  z-index: 1000 !important;
+  pointer-events: none;
+  transform: scale(1.08);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3);
+}
+
+
+/* =========================
+   ボタン
+========================= */
+
+.action-area {
+  width: 100%;
+  margin-top: 4px;
+}
+
+.game-button {
+  min-width: 125px;
+  background: #2f80ed;
+  color: white;
+  font-size: 18px;
+  margin: 5px;
+}
+
+#draw-button {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 180px;
+  min-height: 68px;
+  font-size: 26px;
+  font-weight: 800;
+  z-index: 200;
+}
+
+.confirm-button {
+  background: #219653;
+}
+
+.lose-button {
+  background: #d64545;
+}
+
+.turn-buttons,
+.final-buttons {
+  display: flex;
+  justify-content: center;
+  flex-wrap: nowrap;
+}
+
+.hidden {
+  display: none !important;
+}
+
+
+
+
+
+/* =========================
+   ポップアップ
+========================= */
+
+.message-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(0, 0, 0, 0.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.message-text {
+  font-size: clamp(34px, 10vw, 58px);
+  font-weight: 900;
+  color: white;
+  background: rgba(0, 0, 0, 0.72);
+  border-radius: 18px;
+  padding: 18px 28px;
+}
+
+
+/* =========================
+   オーバーレイ
+========================= */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.overlay-panel {
+  width: min(92vw, 430px);
+  max-height: 85vh;
+  overflow-y: auto;
+  background: white;
+  border-radius: 18px;
+  padding: 24px 18px;
+  text-align: center;
+}
+
+.overlay-panel h2 {
+  margin-top: 0;
+}
+
+.small-warning {
+  color: #b33;
+  font-size: 14px;
+}
+
+.overlay-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
+/* =========================
+   墓地履歴
+========================= */
+
+.graveyard-history {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 7px;
+  max-height: 55vh;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.history-card {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border: 1px solid #777;
+  border-radius: 5px;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+}
+
+
+/* =========================
+   結果画面
+========================= */
+
+#result-title {
+  margin-top: 70px;
+  font-size: clamp(42px, 12vw, 70px);
+}
+
+.result-message {
+  font-size: 22px;
+  margin: 10px 0 20px;
+}
+
+#result-turns {
+  margin-bottom: 30px;
+  font-size: 18px;
+}
+
+
+/* =========================
+   遊び方・記録・設定
+========================= */
+
+.howto-content,
+.records-content,
+.settings-content {
+  width: min(92vw, 500px);
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 25px;
+  line-height: 1.8;
+}
+
+.records-content > div {
+  margin: 15px 0;
+  font-size: 18px;
+}
+
+.records-content strong {
+  font-size: 26px;
+  margin-left: 8px;
+}
+
+
+/* =========================
+   レスポンシブ
+========================= */
+
+:root {
+  --card-width: clamp(54px, 16.5vw, 78px);
+  --stack-extra: calc(var(--card-width) * 3);
+  --hand-gap: calc(var(--card-width) * 2);
+}
+
+@media (max-height: 760px) {
+  :root {
+    --card-width: clamp(48px, 15vw, 68px);
+    --stack-extra: calc(var(--card-width) * 5.7);
+    --hand-gap: calc(var(--card-width) * 5.5);
+  }
+
+  .turn-area {
+    height: 34px;
+  }
+
+  .deck-area {
+    margin-top: 8px;
+    margin-bottom: 10px;
+  }
+
+  .action-area {
+    margin-top: 4px;
+  }
+}
+
+@media (min-width: 700px) {
+  :root {
+    --card-width: 78px;
+    --stack-extra: calc(var(--card-width) * 3);
+    --hand-gap: calc(var(--card-width) * 2);
+  }
+
+  #game-screen {
+    max-width: 760px;
+    margin: 0 auto;
+  }
+}
+
+.turn-slide {
+  animation: turnSlideIn 0.6s ease-out;
+}
+
+@keyframes turnSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.turn-popup {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(0.7);
+  z-index: 500;
+  
+  padding: 18px 34px;
+  border-radius: 18px;
+  
+  background: rgba(255, 255, 255, 0.96);
+  border: 4px solid #1d70d6;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22);
+  
+  color: #1d70d6;
+  font-size: clamp(32px, 8vw, 58px);
+  font-weight: 900;
+  white-space: nowrap;
+  
+  opacity: 0;
+  pointer-events: none;
+}
+
+.turn-popup.show {
+  animation: turnPopup 1.1s ease-out forwards;
+}
+
+@keyframes turnPopup {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.65);
+  }
+
+  20% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.12);
+  }
+
+  35% {
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+
+  50% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  78% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+}
+
+/* 3セット以上作ったときの注意ポップアップ */
+.set-limit-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+
+  z-index: 1000;
+
+  padding: 18px 28px;
+  border-radius: 14px;
+
+  background: white;
+  border: 3px solid #2f80ed;
+
+  color: #333;
+  font-size: 20px;
+  font-weight: 800;
+  text-align: center;
+
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.2);
+
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 表示時 */
+.set-limit-popup.show {
+  animation: setLimitPopup 1.2s ease-out forwards;
+}
+
+@keyframes setLimitPopup {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.85);
+  }
+
+  20% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+
+  35% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  80% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.98);
+  }
+}
+
+/* You Win! ポップアップ */
+.win-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+
+  transform: translate(-50%, -50%) scale(0.7);
+
+  z-index: 2000;
+
+  min-width: 260px;
+  padding: 30px 34px;
+
+  background: #ffffff;
+  border: 4px solid #2f80ed;
+  border-radius: 20px;
+
+  text-align: center;
+
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 表示中 */
+.win-popup.show {
+  animation: winPopupShow 0.45s ease-out forwards;
+  pointer-events: auto;
+}
+
+/* You Win! */
+.win-popup-title {
+  font-size: 42px;
+  font-weight: 900;
+  color: #2f80ed;
+  margin-bottom: 12px;
+}
+
+/* クリアしました */
+.win-popup-message {
+  font-size: 21px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 18px;
+}
+
+/* タップ案内 */
+.win-popup-hint {
+  font-size: 15px;
+  color: #666;
+}
+
+@keyframes winPopupShow {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.7);
+  }
+
+  70% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.lose-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+
+  transform: translate(-50%, -50%) scale(0.7);
+
+  z-index: 2000;
+
+  min-width: 260px;
+  padding: 30px 34px;
+
+  background: #ffffff;
+  border: 4px solid #d62828;
+  border-radius: 20px;
+
+  text-align: center;
+
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+
+  opacity: 0;
+  pointer-events: none;
+}
+
+.lose-popup.show {
+  animation: losePopupShow 0.45s ease-out forwards;
+  pointer-events: auto;
+}
+
+.lose-popup-title {
+  font-size: 42px;
+  font-weight: 900;
+  color: #d62828;
+  margin-bottom: 12px;
+}
+
+.lose-popup-message {
+  font-size: 21px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 18px;
+}
+
+.lose-popup-hint {
+  font-size: 15px;
+  color: #666;
+}
+
+@keyframes losePopupShow {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.7);
+  }
+
+  70% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* ==================== 結果画面・スコア ==================== */ 
+#result-score { 
+  width: min(90%, 420px); 
+  margin: 24px auto; padding: 18px 20px; 
+  background: #ffffff; 
+  border-radius: 16px; 
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); 
+  box-sizing: border-box; 
+} 
+  
+.score-row { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; gap: 16px; 
+    padding: 4px 0; 
+    font-size: 16px; 
+    font-weight: 700; 
+  } 
+  
+.score-row span:last-child { 
+    min-width: 55px; 
+    text-align: right; 
+    font-variant-numeric: tabular-nums; 
+  } 
+  
+.score-set-total {
+  padding-bottom: 10px;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.score-detail-area {
+  padding-top: 8px;
+  border-top: 2px solid #ddd;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 8px;
+}
+
+.score-detail {
+  padding: 3px 0 3px 18px;
+  font-size: 15px;
+  font-weight: 600;
+}
+  
+.score-total-final { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; margin-top: 14px; 
+    padding: 12px 4px 4px; 
+    border-top: 3px solid #333; 
+    font-size: 22px; font-weight: 900; 
+  } 
+  
+.score-total-final span:last-child { 
+    font-size: 26px; 
+    font-variant-numeric: tabular-nums; 
+  }
+
+  .score-bonus-row.hidden {
+  display: none;
+}
+
+.new-best-message.hidden {
+  display: none;
+}
+
+/* ====================
+   ベストスコア表示
+==================== */
+
+.records-best {
+  width: min(92%, 420px);
+  margin: 20px auto 24px;
+  padding: 16px 18px;
+  box-sizing: border-box;
+
+  background: #fffdf0;
+  border: 3px solid #f2c94c;
+  border-radius: 16px;
+}
+
+.records-best h2 {
+  margin: 0 0 12px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.best-score-row {
+  display: grid;
+  grid-template-columns: 42px 1fr auto;
+  align-items: center;
+  gap: 48px;
+
+  padding: 7px 4px;
+
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.best-score-row:last-child {
+  border-bottom: none;
+}
+
+.best-score-rank {
+  font-weight: 800;
+  text-align: center;
+}
+
+.best-score-points {
+  font-size: 18px;
+  font-weight: 900;
+  text-align: right;
+}
+
+.best-score-date {
+  font-size: 12px;
+  color: #777;
+  white-space: nowrap;
+}
+
+.no-record {
+  padding: 12px 0;
+  text-align: center;
+  color: #777;
+  font-size: 14px;
+}
+
+/* 本日の成績 */
+.today-summary {
+  text-align: center;
+  margin: 10px 0 16px;
+}
+
+.today-summary-title {
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+}
+
+.today-summary-result {
+  display: flex;
+  justify-content: center;
+  gap: 28px;
+  font-size: 1rem;
+}
+
+.today-summary-result strong {
+  font-size: 1.2rem;
+}
+
+#today-best-score,
+#all-time-best-score {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+
+
+.fixed-menu-area {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  display: flex;
+  justify-content: center;
+
+  padding: 6px 20px 8px;
+  box-sizing: border-box;
+
+  background: rgba(255, 255, 255, 0.96);
+  border-top: 1px solid #e5e5e5;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
+
+  z-index: 1000;
+}
+
+#solo-menu-back-button,
+#result-menu-button {
+  min-width: 180px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+#game-menu-button {
+  min-width: 110px;
+  width: 110px;
+  min-height: 42px;
+  padding: 6px 14px;
+  font-size: 15px;
+}
+
+.game-control-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+#game-menu-button {
+  width: 110px;
+  min-width: 110px;
+}
+
+#pass-button {
+  width: 110px;
+  min-width: 110px;
+}
+
+#confirm-button {
+  width: 140px;
+  min-width: 140px;
+}
+
+/* =========================================================
+   設定画面
+========================================================= */
+
+.setting-item {
+  width: 100%;
+  margin: 20px auto 30px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.setting-title {
+  font-size: 22px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.sound-options {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.sound-option {
+  width: 70px;
+  padding: 10px 4px;
+  border: 2px solid #bbb;
+  border-radius: 10px;
+  background: white;
+  color: #333;
+  font-size: 17px;
+  font-weight: bold;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.sound-option.selected {
+  border-color: #2f80ed;
+  background: #2f80ed;
+  color: white;
+}
+
+.sound-option:active {
+  transform: scale(0.96);
+}

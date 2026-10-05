@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>たして10か20</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <div id="app">
+
+    <!-- ==================== メインメニュー ==================== -->
+<section id="menu-screen" class="screen active">
+  <h1>たして10か20</h1>
+
+  <div class="menu-illustration">
+    🃏
+  </div>
+
+  <button id="solo-button" class="main-button">
+    ひとりで遊ぶ
+  </button>
+
+  <!-- 本日の成績 -->
+  <div class="today-summary">
+    <div class="today-summary-title">本日の成績</div>
+    <div class="today-summary-result">
+      <span><strong id="menu-wins">0</strong>勝</span>
+      <span><strong id="menu-losses">0</strong>敗</span>
+    </div>
+  </div>
+
+  <button id="versus-button" class="main-button">
+    2人で対戦する
+  </button>
+
+  <button id="records-button" class="sub-button">
+    成績・記録
+  </button>
+
+  <button id="howto-button" class="sub-button">
+    あそびかた
+  </button>
+
+  <button id="settings-button" class="sub-button">
+    設定
+  </button>
+</section>
+
+
+   <!-- ==================== ソロ開始画面 ==================== -->
+<section id="solo-menu-screen" class="screen">
+
+  <h1>たして10か20</h1>
+
+  <div class="menu-illustration">
+    🃏
+  </div>
+
+  <button id="start-game-button" class="main-button">
+    ゲームスタート
+  </button>
+
+  <div class="daily-record">
+
+    
+    <div id="challenge-count">
+      0回目の挑戦
+    </div>
+
+    <div id="win-loss">
+      0勝0敗
+    </div>
+
+  </div>
+
+  <div class="solo-best-record">
+
+    <div class="solo-best-title">
+      本日のベストスコア
+    </div>
+
+    <div id="today-best-score">
+      0点
+    </div>
+
+    <div class="solo-best-title">
+      これまでのベストスコア
+    </div>
+
+    <div id="all-time-best-score">
+      0点
+    </div>
+
+  </div>
+
+  <div class="fixed-menu-area">
+  <button id="solo-menu-back-button" class="sub-button">
+    メニューへ
+  </button>
+</div>
+
+</section>
+
+
+    <!-- ==================== ゲーム画面 ==================== -->
+    <section id="game-screen" class="screen">
+
+      
+
+
+      <!-- 山札・墓地 -->
+      <div class="deck-area">
+
+        <div class="deck-box">
+          <div class="card-stack-label">山札</div>
+          <div id="deck-count">40枚</div>
+        </div>
+
+        <div class="turn-area">
+        <div id="turn-display">第1ターン</div>
+      </div>
+
+      <div id="turn-popup" class="turn-popup"></div>
+
+
+        <div id="graveyard" class="graveyard-box">
+          <div class="card-stack-label">墓地</div>
+          <div id="graveyard-card" class="grave-card-empty">
+            -
+          </div>
+        </div>
+
+      </div>
+
+
+      <!-- 場札 -->
+      <div id="field-area" class="field-area">
+        <!-- JavaScriptで生成 -->
+      </div>
+
+
+      <!-- 手札 -->
+      <div id="hand-area" class="hand-area">
+        <!-- JavaScriptで生成 -->
+      </div>
+
+
+      <!-- ボタン -->
+      <div id="action-area" class="action-area">
+
+  <button id="draw-button" class="game-button">
+    ドロー
+  </button>
+
+</div>
+
+
+<!-- ゲーム中メニュー・ターン操作 -->
+<div class="fixed-menu-area game-control-area">
+
+  <button id="game-menu-button" class="sub-button">
+    メニューへ
+  </button>
+
+  <div id="turn-buttons" class="turn-buttons hidden">
+
+    <button id="pass-button" class="game-button">
+      パス
+    </button>
+
+    <button id="confirm-button" class="game-button confirm-button">
+      決定
+    </button>
+
+  </div>
+
+  <div id="final-buttons" class="final-buttons hidden">
+
+    <button id="cannot-make-set-button" class="game-button lose-button">
+      セットを作れない
+    </button>
+
+    <button id="final-confirm-button" class="game-button confirm-button">
+      決定
+    </button>
+
+  </div>
+
+</div>
+
+    </section>
+
+
+    <!-- ==================== 完成ポップアップ ==================== -->
+    <div id="message-overlay" class="message-overlay hidden">
+      <div id="message-text" class="message-text"></div>
+    </div>
+
+    <div id="set-limit-popup" class="set-limit-popup">
+  一度に決定できるセットは2つまでです
+    </div>
+
+    <div id="win-popup" class="win-popup">
+  <div class="win-popup-title">You Win!</div>
+  <div class="win-popup-message">クリアしました！</div>
+  <div class="win-popup-hint">タップして結果を見る</div>
+</div>
+
+    <div id="lose-popup" class="lose-popup">
+  <div class="lose-popup-title">You Lose!</div>
+  <div class="lose-popup-message">残念！</div>
+  <div class="lose-popup-hint">タップして結果を見る</div>
+</div>
+
+
+    <!-- ==================== ゲーム終了 ==================== -->
+    <section id="result-screen" class="screen">
+
+      <h1 id="result-title">You Win!</h1>
+
+      <div id="result-message" class="result-message">
+  おめでとう！
+</div>
+
+<div
+  id="new-best-message"
+  class="new-best-message hidden"
+>
+  ベストスコア更新！
+</div>
+
+<div id="result-turns"></div>
+
+      <div id="result-score">
+         <div class="score-row">
+           <span>クリアポイント</span>
+            <span id="score-clear">0</span>
+          </div>
+           
+          <div class="score-row">
+             <span>のこりカードポイント</span>
+              <span id="score-deck">0</span>
+          </div>
+              
+          <div class="score-row score-set-total">
+  <span>セットポイント</span>
+  <span id="score-set-total">0</span>
+</div>
+
+<div class="score-detail-area">
+
+  <div class="score-row score-detail">
+    <span>カラーコンボ</span>
+    <span id="score-color">0</span>
+  </div>
+
+  <div class="score-row score-detail">
+    <span>マークコンボ</span>
+    <span id="score-suit">0</span>
+  </div>
+
+  <div class="score-row score-detail">
+    <span>ノーマル</span>
+    <span id="score-normal">0</span>
+  </div>
+
+</div>
+                   
+  <div
+  id="score-speed-row"
+  class="score-row score-bonus-row hidden"
+>
+  <span>スピードボーナス</span>
+  <span id="score-speed">0</span>
+</div>
+
+<div
+  id="score-one-shot-row"
+  class="score-row score-bonus-row hidden"
+>
+  <span>ワンショット</span>
+  <span id="score-one-shot">0</span>
+</div>
+
+<div
+  id="score-last-shot-row"
+  class="score-row score-bonus-row"
+  style="display: none;"
+>
+  <span>ラストショット</span>
+  <span id="score-last-shot">0</span>
+</div>
+                        
+    <div class="score-total-final">
+         <span>TOTAL</span>
+         <span id="score-total">0</span> 
+      </div> 
+    </div>
+
+      <button id="retry-button" class="main-button">
+        もう一度挑戦する
+      </button>
+
+      <div class="fixed-menu-area">
+  <button id="result-menu-button" class="sub-button">
+    メニューへ
+  </button>
+</div>
+
+    </section>
+
+
+    <!-- ==================== 墓地確認 ==================== -->
+    <div id="graveyard-overlay" class="overlay hidden">
+
+      <div class="overlay-panel">
+
+        <h2>墓地</h2>
+
+        <div id="graveyard-history" class="graveyard-history">
+        </div>
+
+        <button id="close-graveyard-button" class="sub-button">
+          戻る
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- ==================== ゲーム終了確認 ==================== -->
+    <div id="exit-overlay" class="overlay hidden">
+
+      <div class="overlay-panel">
+
+        <h2>ゲームを終了しますか？</h2>
+
+        <p>
+          ゲームの途中ですが、<br>
+          終了しますか？
+        </p>
+
+        <p class="small-warning">
+          途中経過は記録されません。
+        </p>
+
+        <div class="overlay-buttons">
+
+          <button id="continue-game-button" class="sub-button">
+            ゲームに戻る
+          </button>
+
+          <button id="exit-game-button" class="game-button lose-button">
+            終了する
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ==================== 遊び方 ==================== -->
+    <section id="howto-screen" class="screen">
+
+      <h1>あそびかた</h1>
+
+      <div class="howto-content">
+
+        <p>
+          場札と手札を使って、<strong>10</strong>または<strong>20</strong>を作ります。
+        </p>
+
+        <p>
+          場札1枚と手札を組み合わせて、合計を10または20にします。
+        </p>
+
+        <p>
+          1ターンに最大2セット作れます。
+        </p>
+
+        <p>
+          カードは手札から場札へドラッグします。
+        </p>
+
+        <p>
+          戻したいカードは、場札から手札へドラッグします。
+        </p>
+
+        <p>
+          山札がなくなった次のターンが最終ターンです。
+        </p>
+
+      </div>
+
+      <button id="howto-back-button" class="sub-button">
+        戻る
+      </button>
+
+    </section>
+
+
+    <!-- ==================== 記録 ==================== -->
+<section id="records-screen" class="screen">
+
+  <h1>成績・記録</h1>
+
+  <!-- ベストスコア -->
+  <div class="records-best">
+
+    <h2>ベストスコア</h2>
+
+    <div id="best-score-list">
+      <!-- JavaScriptでTOP5を表示 -->
+    </div>
+
+  </div>
+
+  <!-- 本日の記録 -->
+  <div class="records-content">
+
+    <div>
+      本日の挑戦
+      <strong id="records-challenge">0</strong>回
+    </div>
+
+    <div>
+      本日の勝利
+      <strong id="records-wins">0</strong>勝
+    </div>
+
+    <div>
+      本日の敗北
+      <strong id="records-losses">0</strong>敗
+    </div>
+
+  </div>
+
+  <button id="records-back-button" class="sub-button">
+    戻る
+  </button>
+
+</section>
+
+
+    <!-- ==================== 設定 ==================== -->
+<section id="settings-screen" class="screen">
+
+  <h1>設定</h1>
+
+  <div class="settings-content">
+
+    <div class="setting-item">
+
+      <div class="setting-title">
+        効果音
+      </div>
+
+      <div class="sound-options">
+
+        <button
+          id="sound-off-button"
+          class="sound-option"
+          type="button">
+          OFF
+        </button>
+
+        <button
+          id="sound-small-button"
+          class="sound-option"
+          type="button">
+          小
+        </button>
+
+        <button
+          id="sound-medium-button"
+          class="sound-option"
+          type="button">
+          中
+        </button>
+
+        <button
+          id="sound-large-button"
+          class="sound-option"
+          type="button">
+          大
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <button id="settings-back-button" class="sub-button">
+    戻る
+  </button>
+
+</section>
+
+  </div>
+
+  <script src="game.js"></script>
+
+</body>
+</html>
