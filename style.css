@@ -153,8 +153,9 @@ h1 {
 
 .deck-box,
 .graveyard-box {
-  width: 70px;
-  height: 92px;
+  --small-card-scale: 0.9;
+  width: calc(var(--card-width) * var(--small-card-scale));
+  height: calc(var(--card-width) * var(--small-card-scale) * 1.3333);
   border-radius: 8px;
   border: 2px solid #555;
   background: white;
@@ -186,9 +187,10 @@ h1 {
   font-weight: 700;
 }
 
-#deck-count {
+#game-screen #deck-count {
   margin-top: 5px;
-  font-size: 13px;
+  font-size: clamp(20px, 2.5vw, 30px);
+  font-weight: 700;
 }
 
 .grave-card-empty {
@@ -602,7 +604,7 @@ h1 {
 ========================= */
 
 #result-title {
-  margin-top: 70px;
+  margin-top: 10px;
   font-size: clamp(42px, 12vw, 70px);
 }
 
@@ -656,8 +658,8 @@ h1 {
 @media (max-height: 760px) {
   :root {
     --card-width: clamp(48px, 15vw, 68px);
-    --stack-extra: calc(var(--card-width) * 5.7);
-    --hand-gap: calc(var(--card-width) * 5.5);
+    --stack-extra: calc(var(--card-width) * 3);
+    --hand-gap: calc(var(--card-width) * 1.5);
   }
 
   .turn-area {
@@ -675,16 +677,116 @@ h1 {
 }
 
 @media (min-width: 700px) {
+
   :root {
-    --card-width: 78px;
-    --stack-extra: calc(var(--card-width) * 3);
-    --hand-gap: calc(var(--card-width) * 2);
+  --card-width: clamp(
+    100px,
+    calc((92vw - 48px) / 5),
+    140px
+  );
+  --stack-extra: calc(var(--card-width) * 3);
+  --hand-gap: 0px;
+}
+
+  .screen.active {
+    min-height: 100vh;
+    box-sizing: border-box;
   }
 
   #game-screen {
-    max-width: 760px;
+    max-width: 900px;
     margin: 0 auto;
+    min-height: 100vh;
+    box-sizing: border-box;
   }
+
+  /* ゲーム画面をiPadの横幅に合わせて広げる */
+  #game-screen .field-area,
+  #game-screen .hand-area {
+    width: min(92vw, 820px);
+  }
+
+  /* 山札・墓地の間隔も広げる */
+  #game-screen .deck-area {
+    width: min(92vw, 760px);
+  }
+
+  #game-screen .hand-area {
+    margin-top: auto;
+    margin-bottom: 12px;
+  }
+  
+  #game-screen .action-area {
+    flex-shrink: 0;
+  }
+
+    #menu-screen {
+    justify-content: space-evenly;
+  }
+
+  #menu-screen h1 {
+  font-size: 48px;
+}
+
+#menu-screen .menu-illustration {
+  font-size: 72px;
+}
+
+#menu-screen .main-button {
+  min-width: 320px;
+  min-height: 72px;
+  font-size: 28px;
+}
+
+#menu-screen .sub-button {
+  min-width: 260px;
+  min-height: 58px;
+  font-size: 22px;
+}
+
+#menu-screen .today-summary {
+  font-size: 22px;
+}
+
+#menu-screen .today-summary-title {
+  font-size: 24px;
+}
+
+#menu-screen .today-summary-result {
+  font-size: 26px;
+}
+
+#solo-menu-screen {
+  justify-content: space-evenly;
+}
+
+#solo-menu-screen h1 {
+  font-size: 48px;
+}
+
+#solo-menu-screen .menu-illustration {
+  font-size: 72px;
+}
+
+#solo-menu-screen #start-game-button {
+  min-width: 320px;
+  min-height: 72px;
+  font-size: 28px;
+}
+
+#solo-menu-screen .daily-record {
+  font-size: 24px;
+}
+
+#solo-menu-screen .solo-best-title {
+  font-size: 24px;
+}
+
+#solo-menu-screen #today-best-score,
+#solo-menu-screen #all-time-best-score {
+  font-size: 30px;
+}
+
 }
 
 .turn-slide {
@@ -702,6 +804,22 @@ h1 {
     transform: translateX(0);
   }
 }
+
+
+/* 横長画面：画面の高さを基準にカードサイズを調整 */
+@media (min-width: 700px) and (orientation: landscape) {
+  :root {
+    --card-width: clamp(
+      80px,
+      11vh,
+      120px
+    );
+
+    --stack-extra: calc(var(--card-width) * 3);
+  }
+}
+
+
 
 .turn-popup {
   position: fixed;
@@ -995,19 +1113,26 @@ h1 {
   font-weight: 600;
 }
   
-.score-total-final { 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; margin-top: 14px; 
-    padding: 12px 4px 4px; 
-    border-top: 3px solid #333; 
-    font-size: 22px; font-weight: 900; 
-  } 
-  
-.score-total-final span:last-child { 
-    font-size: 26px; 
-    font-variant-numeric: tabular-nums; 
-  }
+/* 結果画面・合計ポイント */
+.result-total-top {
+  width: min(90%, 420px);
+  margin: 8px auto 12px;
+  padding: 10px 16px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  box-sizing: border-box;
+
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.result-total-top span:last-child {
+  font-size: 30px;
+  font-variant-numeric: tabular-nums;
+}
 
   .score-bonus-row.hidden {
   display: none;
@@ -1015,6 +1140,17 @@ h1 {
 
 .new-best-message.hidden {
   display: none;
+}
+
+.result-fixed-menu {
+  gap: 10px;
+}
+
+.result-fixed-menu button {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 220px;
+  box-sizing: border-box;
 }
 
 /* ====================
