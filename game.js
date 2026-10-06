@@ -1826,11 +1826,19 @@ function renderField() {
           "stacked-card"
         );
 
-      /*
-       * 上から順番に少しずつ下へずらす
-       */
-      element.style.top =
-        `${(stackIndex + 1) * 0.42 * getCardWidth()}px`;
+      // 画面幅に応じてカードの重なり量を自動調整
+const screenWidth = window.innerWidth;
+
+const stackOffset = Math.min(
+  0.75,
+  Math.max(
+    0.44,
+    0.44 + (screenWidth - 375) * (0.31 / (1024 - 375))
+  )
+);
+
+element.style.top =
+  `${(stackIndex + 1) * stackOffset * getCardWidth()}px`;
 
       element.dataset.fieldIndex =
         fieldIndex;
