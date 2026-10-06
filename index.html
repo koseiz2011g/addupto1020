@@ -216,101 +216,105 @@
 </div>
 
 
-    <!-- ==================== ゲーム終了 ==================== -->
-    <section id="result-screen" class="screen">
+<!-- ==================== ゲーム終了 ==================== -->
+<section id="result-screen" class="screen">
 
-      <h1 id="result-title">You Win!</h1>
-
-      <div id="result-message" class="result-message">
-  おめでとう！
-</div>
-
-<div
-  id="new-best-message"
-  class="new-best-message hidden"
->
-  ベストスコア更新！
-</div>
-
-<div id="result-turns"></div>
-
-      <div id="result-score">
-         <div class="score-row">
-           <span>クリアポイント</span>
-            <span id="score-clear">0</span>
-          </div>
-           
-          <div class="score-row">
-             <span>のこりカードポイント</span>
-              <span id="score-deck">0</span>
-          </div>
-              
-          <div class="score-row score-set-total">
-  <span>セットポイント</span>
-  <span id="score-set-total">0</span>
-</div>
-
-<div class="score-detail-area">
-
-  <div class="score-row score-detail">
-    <span>カラーコンボ</span>
-    <span id="score-color">0</span>
+  <!-- 合計ポイントを最上部に表示 -->
+  <div class="result-total-top">
+    <span>TOTAL</span>
+    <span id="score-total">0</span>
   </div>
 
-  <div class="score-row score-detail">
-    <span>マークコンボ</span>
-    <span id="score-suit">0</span>
+  <h1 id="result-title">You Win!</h1>
+
+  <div id="result-message" class="result-message">
+    おめでとう！
   </div>
 
-  <div class="score-row score-detail">
-    <span>ノーマル</span>
-    <span id="score-normal">0</span>
-  </div>
-
-</div>
-                   
   <div
-  id="score-speed-row"
-  class="score-row score-bonus-row hidden"
->
-  <span>スピードボーナス</span>
-  <span id="score-speed">0</span>
-</div>
+    id="new-best-message"
+    class="new-best-message hidden"
+  >
+    ベストスコア更新！
+  </div>
 
-<div
-  id="score-one-shot-row"
-  class="score-row score-bonus-row hidden"
->
-  <span>ワンショット</span>
-  <span id="score-one-shot">0</span>
-</div>
+  <div id="result-turns"></div>
 
-<div
-  id="score-last-shot-row"
-  class="score-row score-bonus-row"
-  style="display: none;"
->
-  <span>ラストショット</span>
-  <span id="score-last-shot">0</span>
-</div>
-                        
-    <div class="score-total-final">
-         <span>TOTAL</span>
-         <span id="score-total">0</span> 
-      </div> 
+  <div id="result-score">
+
+    <div class="score-row">
+      <span>クリアポイント</span>
+      <span id="score-clear">0</span>
     </div>
 
-      <button id="retry-button" class="main-button">
-        もう一度挑戦する
-      </button>
+    <div class="score-row">
+      <span>のこりカードポイント</span>
+      <span id="score-deck">0</span>
+    </div>
 
-      <div class="fixed-menu-area">
-  <button id="result-menu-button" class="sub-button">
-    メニューへ
-  </button>
-</div>
+    <div class="score-row score-set-total">
+      <span>セットポイント</span>
+      <span id="score-set-total">0</span>
+    </div>
 
-    </section>
+    <div class="score-detail-area">
+
+      <div class="score-row score-detail">
+        <span>カラーコンボ</span>
+        <span id="score-color">0</span>
+      </div>
+
+      <div class="score-row score-detail">
+        <span>マークコンボ</span>
+        <span id="score-suit">0</span>
+      </div>
+
+      <div class="score-row score-detail">
+        <span>ノーマル</span>
+        <span id="score-normal">0</span>
+      </div>
+
+    </div>
+
+    <div
+      id="score-speed-row"
+      class="score-row score-bonus-row hidden"
+    >
+      <span>スピードボーナス</span>
+      <span id="score-speed">0</span>
+    </div>
+
+    <div
+      id="score-one-shot-row"
+      class="score-row score-bonus-row hidden"
+    >
+      <span>ワンショット</span>
+      <span id="score-one-shot">0</span>
+    </div>
+
+    <div
+      id="score-last-shot-row"
+      class="score-row score-bonus-row"
+      style="display: none;"
+    >
+      <span>ラストショット</span>
+      <span id="score-last-shot">0</span>
+    </div>
+
+  </div>
+
+  <!-- 結果画面の下部固定ボタン -->
+  <div class="fixed-menu-area result-fixed-menu">
+    <button id="result-menu-button" class="sub-button">
+      メニューへ
+    </button>
+
+    <button id="retry-button" class="sub-button">
+      もう一度挑戦する
+    </button>
+  </div>
+
+</section>
 
 
     <!-- ==================== 墓地確認 ==================== -->
