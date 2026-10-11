@@ -10,6 +10,7 @@
    DOM
 ========================================================= */
 
+
 const screens = {
   menu: document.getElementById("menu-screen"),
   soloMenu: document.getElementById("solo-menu-screen"),
@@ -17,8 +18,12 @@ const screens = {
   result: document.getElementById("result-screen"),
   howto: document.getElementById("howto-screen"),
   records: document.getElementById("records-screen"),
-  settings: document.getElementById("settings-screen")
+  settings: document.getElementById("settings-screen"),
+  versusMenu: document.getElementById("versus-menu-screen"),
+  battleTest: document.getElementById("battle-test-screen"),
+  battleResult: document.getElementById("battle-result-screen")
 };
+
 
 const fieldArea = document.getElementById("field-area");
 const handArea = document.getElementById("hand-area");
@@ -68,10 +73,65 @@ document.getElementById("solo-button")
     updateDailyDisplay();
   });
 
+
 document.getElementById("versus-button")
   .addEventListener("click", () => {
-    alert("2人対戦は次の段階で追加します。");
+    showScreen("versusMenu");
   });
+
+  
+/* 対戦メニューからゲームスタート */
+document.getElementById("battle-start-button")
+  .addEventListener("click", () => {
+    console.log("対戦開始ボタンが押されました");
+    console.log("battleGame:", typeof battleGame);
+    startBattleGame();
+    showScreen("battleTest");
+  });
+
+/* 対戦メニューからメインメニューへ戻る */
+document.getElementById("versus-menu-back-button")
+  .addEventListener("click", () => {
+    showScreen("menu");
+  });
+
+
+/* 対戦終了の確認ポップアップ */
+const battleExitOverlay =
+  document.getElementById("battle-exit-overlay");
+
+document.querySelector(".battle-menu-button")
+  .addEventListener("click", () => {
+    battleExitOverlay.classList.remove("hidden");
+  });
+
+/* キャンセル：対戦を続ける */
+document.getElementById("battle-exit-cancel")
+  .addEventListener("click", () => {
+    battleExitOverlay.classList.add("hidden");
+  });
+
+/* OK：対戦メニューへ戻る */
+document.getElementById("battle-exit-ok")
+  .addEventListener("click", () => {
+    battleExitOverlay.classList.add("hidden");
+    showScreen("versusMenu");
+  });
+
+  
+/* 対戦結果画面：メニューへ */
+document.getElementById("battle-result-menu")
+  .addEventListener("click", () => {
+    showScreen("menu");
+  });
+
+/* 対戦結果画面：もう一度対戦 */
+document.getElementById("battle-result-replay")
+  .addEventListener("click", () => {
+    startBattleGame();
+    showScreen("battleTest");
+  });
+
 
 document.getElementById("records-button")
   .addEventListener("click", () => {
@@ -315,6 +375,586 @@ const game = {
   dragging: null
 };
 
+/* =========================================================
+   2人対戦ゲーム状態
+========================================================= */
+
+const battleGame = {
+
+  inProgress: false,
+
+  /*
+   * 共有山札
+   */
+  deck: [],
+
+  /*
+   * 共有場札
+   */
+  field: [],
+
+  /*
+   * 共有墓地
+   */
+  graveyard: [],
+
+    /*
+   * 決定対象として選択したセットの場札番号
+   * 最大2セット
+   */
+  selectedSets: [],
+
+  /*
+   * プレイヤー
+   */
+  players: [
+    {
+      hand: []
+    },
+    {
+      hand: []
+    }
+  ],
+
+  /*
+   * 現在の手番
+   * 0 = 左プレイヤー
+   * 1 = 右プレイヤー
+   */
+  currentPlayer: 0,
+
+  /*
+   * ターン数
+   */
+  turn: 1,
+
+  /*
+   * ドラッグ中のカード
+   */
+  dragging: null,
+
+  /*
+   * 山札が0になった後の
+   * 最終ターン判定
+   */
+  lastTurn: false,
+
+  hasDrawn: false,
+
+  /*
+   * 最初のプレイヤーが
+   * 初回ターンで手札0枚になった場合
+   */
+  firstPlayerCleared: false
+};
+
+/* =========================================================
+   2人対戦：カード作成
+========================================================= */
+
+function createBattleDeck() {
+
+  const suits = [
+    { symbol: "♠", color: "black" },
+    { symbol: "♣", color: "black" },
+    { symbol: "♥", color: "red" },
+    { symbol: "♦", color: "red" }
+  ];
+
+  const deck = [];
+
+  suits.forEach(suit => {
+
+    for (let value = 1; value <= 10; value++) {
+
+      deck.push({
+        value,
+        suit: suit.symbol,
+        color: suit.color
+      });
+
+    }
+
+  });
+
+  return deck;
+}
+
+
+/* =========================================================
+   2人対戦：シャッフル
+========================================================= */
+
+function shuffleBattleDeck(deck) {
+
+  for (let i = deck.length - 1; i > 0; i--) {
+
+    const j =
+      Math.floor(Math.random() * (i + 1));
+
+    [deck[i], deck[j]] =
+      [deck[j], deck[i]];
+  }
+
+  return deck;
+}
+
+
+/* =========================================================
+   2人対戦：ゲーム開始
+========================================================= */
+
+function startBattleGame() {
+
+  /*
+   * 40枚を作ってシャッフル
+   */
+  const deck =
+    shuffleBattleDeck(
+      createBattleDeck()
+    );
+
+
+  /*
+   * ゲーム状態を初期化
+   */
+  battleGame.deck = deck;
+
+  battleGame.field = [];
+
+  battleGame.graveyard = [];
+
+    battleGame.selectedSets = [];
+
+  battleGame.players[0].hand = [];
+
+  battleGame.players[1].hand = [];
+
+  battleGame.currentPlayer = 0;
+
+  battleGame.hasDrawn = false;
+
+  battleGame.turn = 1;
+
+  battleGame.dragging = null;
+
+  battleGame.lastTurn = false;
+
+  battleGame.firstPlayerCleared = false;
+
+  battleGame.inProgress = true;
+
+
+  /*
+   * 場札4枚
+   */
+  for (let i = 0; i < 4; i++) {
+
+    const card =
+      battleGame.deck.pop();
+
+    battleGame.field.push({
+      base: card,
+      stack: []
+    });
+  }
+
+
+  /*
+   * プレイヤー1に5枚
+   */
+  for (let i = 0; i < 5; i++) {
+
+    battleGame.players[0].hand.push(
+      battleGame.deck.pop()
+    );
+  }
+
+
+  /*
+   * プレイヤー2に5枚
+   */
+  for (let i = 0; i < 5; i++) {
+
+    battleGame.players[1].hand.push(
+      battleGame.deck.pop()
+    );
+  }
+
+  
+
+
+  renderBattle();
+}
+
+
+/* =========================================================
+   2人対戦：場札の合計
+========================================================= */
+
+function getBattleStackSum(fieldIndex) {
+
+  const field =
+    battleGame.field[fieldIndex];
+
+  if (!field) {
+    return 0;
+  }
+
+  return field.base.value +
+    field.stack.reduce(
+      (sum, card) =>
+        sum + card.value,
+      0
+    );
+}
+
+function getBattleCardHeight() {
+
+  const layout =
+    document.querySelector(
+      "#battle-test-screen .battle-horizontal-layout"
+    );
+
+  if (!layout) {
+    return 80;
+  }
+
+  const height =
+    parseFloat(
+      getComputedStyle(layout)
+        .getPropertyValue(
+          "--battle-card-height"
+        )
+    );
+
+  if (!Number.isFinite(height)) {
+    return 80;
+  }
+
+  return height;
+}
+
+
+function addBattleCardToField(
+  playerIndex,
+  handIndex,
+  fieldIndex
+) {
+
+  /*
+   * 現在の手番でなければ置けない
+   */
+  if (
+    battleGame.currentPlayer !==
+    playerIndex
+  ) {
+    return;
+  }
+
+  const hand =
+    battleGame.players[
+      playerIndex
+    ].hand;
+
+  const field =
+    battleGame.field[fieldIndex];
+
+  if (!field) {
+    return;
+  }
+
+  const card =
+    hand[handIndex];
+
+  if (!card) {
+    return;
+  }
+
+  /*
+   * 現在の合計
+   */
+    const current =
+    getBattleStackSum(
+      fieldIndex
+    );
+
+  const next =
+    current + card.value;
+
+  /*
+   * 手札から取り出す
+   */
+  hand.splice(
+    handIndex,
+    1
+  );
+
+  /*
+   * 場札に重ねる
+   */
+  field.stack.push(card);
+
+  /*
+   * 効果音
+   */
+  playSound("place");
+
+  /*
+   * 画面更新
+   */
+  renderBattle();
+}
+
+
+function addBattleStackDragEvents(
+  element,
+  fieldIndex,
+  stackIndex
+) {
+  let dragging = false;
+  let offsetX = 0;
+  let offsetY = 0;
+
+  element.addEventListener(
+    "pointerdown",
+    event => {
+      if (
+        !battleGame.inProgress ||
+        battleGame.dragging
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+
+      const rect =
+        element.getBoundingClientRect();
+
+      offsetX = event.clientX - rect.left;
+      offsetY = event.clientY - rect.top;
+
+      dragging = true;
+
+      element.setPointerCapture(
+        event.pointerId
+      );
+
+      element.classList.add("dragging");
+
+      element.style.position = "fixed";
+      element.style.left = `${rect.left}px`;
+      element.style.top = `${rect.top}px`;
+      element.style.width = `${rect.width}px`;
+      element.style.height = `${rect.height}px`;
+      element.style.zIndex = "1000";
+
+      battleGame.dragging = {
+    type: "stack",
+    fieldIndex,
+    stackIndex,
+    card:
+    battleGame.field[fieldIndex]
+      .stack[stackIndex],
+    element
+    };
+    }
+  );
+
+  
+element.addEventListener(
+  "pointermove",
+  event => {
+    if (!dragging) {
+      return;
+    }
+
+    event.preventDefault();
+
+    element.style.left =
+      `${event.clientX - offsetX}px`;
+
+    element.style.top =
+      `${event.clientY - offsetY}px`;
+
+    // 移動先のカード置き場を光らせ、矢印を表示する
+    highlightBattleStackDropTargets(
+      event.clientX,
+      event.clientY,
+      fieldIndex,
+      stackIndex
+    );
+  }
+);
+
+
+    element.addEventListener(
+    "pointerup",
+    event => {
+      if (!dragging) {
+        return;
+      }
+
+      dragging = false;
+
+      element.classList.remove("dragging");
+
+      const playerIndex =
+        battleGame.currentPlayer;
+
+      const handAreas =
+        document.querySelectorAll(
+          "#battle-test-screen .battle-hand"
+        );
+
+      const handArea =
+        handAreas[playerIndex];
+
+      let moved = false;
+
+      // ① 自分の手札へ戻す
+      if (handArea) {
+        const rect =
+          handArea.getBoundingClientRect();
+
+        const insideHand =
+          event.clientX >= rect.left &&
+          event.clientX <= rect.right &&
+          event.clientY >= rect.top &&
+          event.clientY <= rect.bottom;
+
+        if (insideHand) {
+          const field =
+            battleGame.field[fieldIndex];
+
+          if (
+            field &&
+            field.stack[stackIndex]
+          ) {
+            const card =
+              field.stack.splice(
+                stackIndex,
+                1
+              )[0];
+
+            battleGame.players[
+              playerIndex
+            ].hand.push(card);
+
+            playSound("place");
+            moved = true;
+          }
+        }
+      }
+
+      // ② 手札でなければ、別の場札への移動を判定
+      if (!moved) {
+        const target =
+          getBattleFieldAtPoint(
+            event.clientX,
+            event.clientY
+          );
+
+        if (
+          target !== -1 &&
+          target !== fieldIndex
+        ) {
+          const source =
+            battleGame.field[fieldIndex];
+
+          const destination =
+            battleGame.field[target];
+
+          if (
+            source &&
+            destination &&
+            source.stack[stackIndex]
+          ) {
+            const card =
+              source.stack.splice(
+                stackIndex,
+                1
+              )[0];
+
+            destination.stack.push(card);
+
+            playSound("place");
+            moved = true;
+          }
+        }
+      }
+
+      // ③ ドラッグ表示を解除して再描画
+      battleGame.dragging = null;
+
+      renderBattle();
+    }
+  );
+
+  element.addEventListener(
+    "pointercancel",
+    () => {
+      if (!dragging) {
+        return;
+      }
+
+      dragging = false;
+
+      element.classList.remove("dragging");
+      battleGame.dragging = null;
+
+      renderBattle();
+    }
+  );
+}
+
+
+/* =========================================================
+   2人対戦：場札の位置判定
+========================================================= */
+
+function getBattleFieldAtPoint(x, y) {
+
+  const fieldArea =
+    document.querySelector(
+      "#battle-test-screen .battle-field"
+    );
+
+  if (!fieldArea) {
+    return -1;
+  }
+
+  const slots =
+    fieldArea.querySelectorAll(
+      ".battle-field-slot"
+    );
+
+  for (let i = 0; i < slots.length; i++) {
+
+    const rect =
+      slots[i].getBoundingClientRect();
+
+    /*
+     * 場札本体＋重なったカード部分を
+     * ドロップ可能範囲にする
+     */
+    const bottom =
+      rect.bottom +
+      getBattleCardHeight() * 3;
+
+    if (
+      x >= rect.left &&
+      x <= rect.right &&
+      y >= rect.top &&
+      y <= bottom
+    ) {
+      return i;
+    }
+  }
+
+  return -1;
+}
+
 
 /* =========================================================
    デイリー記録
@@ -424,14 +1064,26 @@ function updateRecordsDisplay() {
    画面切り替え
 ========================================================= */
 
-function showScreen(name) {
 
+function showScreen(name) {
   Object.values(screens).forEach(screen => {
+    if (!screen) return;
+
     screen.classList.remove("active");
+    screen.classList.add("hidden");
   });
 
-  screens[name].classList.add("active");
+  const targetScreen = screens[name];
+
+  if (!targetScreen) {
+    console.error("画面が見つかりません:", name);
+    return;
+  }
+
+  targetScreen.classList.remove("hidden");
+  targetScreen.classList.add("active");
 }
+
 
 
 /* =========================================================
@@ -2081,12 +2733,52 @@ function getCardWidth() {
 
 /* =========================================================
    手札ドラッグ
+   ひとり用・2人用で共通利用
 ========================================================= */
 
-function addHandDragEvents(element, handIndex) {
+function addHandDragEvents(
+  element,
+  handIndex,
+  options = {}
+) {
 
-  let startX = 0;
-  let startY = 0;
+  /*
+   * デフォルトは現在のひとり用
+   *
+   * 2人用では後から、
+   * 「どの手札か」「どの場札か」などを
+   * options で差し替える。
+   */
+
+  const getHand =
+    options.getHand ||
+    (() => game.hand);
+
+  const isActive =
+    options.isActive ||
+    (() => game.inProgress);
+
+  const getDraggingState =
+    options.getDraggingState ||
+    (() => game);
+
+  const highlightTargets =
+    options.highlightDropTargets ||
+    highlightDropTargets;
+
+  const clearTargets =
+    options.clearDropTargets ||
+    clearDropTargets;
+
+  const getFieldAt =
+    options.getFieldAtPoint ||
+    getFieldAtPoint;
+
+  const addCard =
+    options.addCardToField ||
+    addCardToField;
+
+
   let offsetX = 0;
   let offsetY = 0;
   let dragging = false;
@@ -2096,11 +2788,13 @@ function addHandDragEvents(element, handIndex) {
     "pointerdown",
     event => {
 
-      if (!game.inProgress) {
+      if (!isActive()) {
         return;
       }
 
-      if (graveyardOverlay.classList.contains("hidden") === false) {
+      if (
+        graveyardOverlay.classList.contains("hidden") === false
+      ) {
         return;
       }
 
@@ -2108,9 +2802,6 @@ function addHandDragEvents(element, handIndex) {
 
       const rect =
         element.getBoundingClientRect();
-
-      startX = event.clientX;
-      startY = event.clientY;
 
       offsetX =
         event.clientX - rect.left;
@@ -2138,9 +2829,25 @@ function addHandDragEvents(element, handIndex) {
       element.style.height =
         `${rect.height}px`;
 
-      game.dragging = {
+
+      /*
+       * 現在の手札を取得
+       */
+      const hand =
+        getHand();
+
+      const card =
+        hand[handIndex];
+
+      /*
+       * ドラッグ中の情報
+       */
+      const draggingState =
+        getDraggingState();
+
+      draggingState.dragging = {
         type: "hand",
-        card: game.hand[handIndex],
+        card,
         handIndex,
         element
       };
@@ -2170,7 +2877,11 @@ function addHandDragEvents(element, handIndex) {
       element.style.top =
         `${y}px`;
 
-      highlightDropTargets(
+
+      /*
+       * ドロップ可能な場札を強調
+       */
+      highlightTargets(
         event.clientX,
         event.clientY
       );
@@ -2188,10 +2899,10 @@ function addHandDragEvents(element, handIndex) {
 
       dragging = false;
 
-      clearDropTargets();
+      clearTargets();
 
       const target =
-        getFieldAtPoint(
+        getFieldAt(
           event.clientX,
           event.clientY
         );
@@ -2203,16 +2914,23 @@ function addHandDragEvents(element, handIndex) {
       element.style.width = "";
       element.style.height = "";
 
+
+      /*
+       * 有効な場札にドロップ
+       */
       if (target !== -1) {
 
-        addCardToField(
+        addCard(
           handIndex,
           target
         );
-
       }
 
-      game.dragging = null;
+
+      const draggingState =
+        getDraggingState();
+
+      draggingState.dragging = null;
 
       renderAll();
     }
@@ -2225,7 +2943,7 @@ function addHandDragEvents(element, handIndex) {
 
       dragging = false;
 
-      clearDropTargets();
+      clearTargets();
 
       element.classList.remove("dragging");
 
@@ -2234,7 +2952,10 @@ function addHandDragEvents(element, handIndex) {
       element.style.width = "";
       element.style.height = "";
 
-      game.dragging = null;
+      const draggingState =
+        getDraggingState();
+
+      draggingState.dragging = null;
 
       renderAll();
     }
@@ -2311,27 +3032,28 @@ function addStackDragEvents(
 
 
   element.addEventListener(
-    "pointermove",
-    event => {
-
-      if (!dragging) {
-        return;
-      }
-
-      event.preventDefault();
-
-      element.style.left =
-        `${event.clientX - offsetX}px`;
-
-      element.style.top =
-        `${event.clientY - offsetY}px`;
-
-      highlightDropTargets(
-        event.clientX,
-        event.clientY
-      );
+  "pointermove",
+  event => {
+    if (!dragging) {
+      return;
     }
-  );
+
+    event.preventDefault();
+
+    element.style.left =
+      `${event.clientX - offsetX}px`;
+
+    element.style.top =
+      `${event.clientY - offsetY}px`;
+
+    highlightBattleStackDropTargets(
+      event.clientX,
+      event.clientY,
+      fieldIndex,
+      stackIndex
+    );
+  }
+);
 
 
   element.addEventListener(
@@ -2432,45 +3154,94 @@ function addStackDragEvents(
 
 /* =========================================================
    手札 → 場札
+   ひとり用・2人用で共通利用
 ========================================================= */
 
 function addCardToField(
   handIndex,
-  fieldIndex
+  fieldIndex,
+  options = {}
 ) {
+
+  /*
+   * デフォルトは現在のひとり用
+   */
+
+  const getHand =
+    options.getHand ||
+    (() => game.hand);
+
+  const getField =
+    options.getField ||
+    (index => game.field[index]);
+
+  const getSum =
+    options.getStackSum ||
+    getStackSum;
+
+
+  /*
+   * 手札を取得
+   */
+
+  const hand =
+    getHand();
 
   if (
     handIndex < 0 ||
-    handIndex >= game.hand.length
+    handIndex >= hand.length
   ) {
     return;
   }
 
+
+  /*
+   * 場札を取得
+   */
+
   const field =
-    game.field[fieldIndex];
+    getField(fieldIndex);
 
   if (!field) {
     return;
   }
 
+
   /*
    * 20になっているセットには追加できない
    */
+
   const current =
-    getStackSum(fieldIndex);
+    getSum(fieldIndex);
 
   if (current >= 20) {
     return;
   }
 
+
+  /*
+   * 手札からカードを取り出す
+   */
+
   const card =
-    game.hand.splice(handIndex, 1)[0];
+    hand.splice(handIndex, 1)[0];
+
+  if (!card) {
+    return;
+  }
+
+
+  /*
+   * 場札のセットへ追加
+   */
 
   field.stack.push(card);
+
 
   /*
    * カードを場札に置いた音
    */
+
   playSound("place");
 }
 
@@ -2595,22 +3366,24 @@ function moveStackCardToField(
 
 /* =========================================================
    ドロップ先判定
+   ひとり用・2人用で共通利用
 ========================================================= */
 
-function getFieldAtPoint(x, y) {
-
+function getFieldAtPoint(
+  x,
+  y,
+  fieldAreaElement = fieldArea,
+  slotSelector = ".field-slot"
+) {
   const slots =
-    fieldArea.querySelectorAll(".field-slot");
+    fieldAreaElement.querySelectorAll(
+      slotSelector
+    );
 
   for (let i = 0; i < slots.length; i++) {
 
     const rect =
       slots[i].getBoundingClientRect();
-
-    /*
-     * 場札本体＋セット部分まで
-     * ドロップ領域にする
-     */
 
     const bottom =
       rect.bottom +
@@ -2632,14 +3405,36 @@ function getFieldAtPoint(x, y) {
 
 /* =========================================================
    ドロップ先の強調
+   ひとり用・2人用で共通利用
 ========================================================= */
 
-function highlightDropTargets(x, y) {
+function highlightDropTargets(
+  x,
+  y,
+  options = {}
+) {
+  const targetFieldArea =
+    options.fieldArea ||
+    fieldArea;
 
-  clearDropTargets();
+  const getField =
+    options.getField ||
+    (index => game.field[index]);
+
+  const getSum =
+    options.getStackSum ||
+    getStackSum;
+
+  const slotSelector =
+    options.slotSelector ||
+    ".field-slot";
+
+  clearDropTargets(targetFieldArea);
 
   const slots =
-    fieldArea.querySelectorAll(".field-slot");
+    targetFieldArea.querySelectorAll(
+      slotSelector
+    );
 
   slots.forEach((slot, index) => {
 
@@ -2650,33 +3445,45 @@ function highlightDropTargets(x, y) {
       x >= rect.left &&
       x <= rect.right &&
       y >= rect.top &&
-      y <= rect.bottom + getCardWidth() * 5
+      y <= rect.bottom +
+        getCardWidth() * 5
     ) {
 
       const field =
-        game.field[index];
+        getField(index);
 
       if (!field) {
         return;
       }
 
       const total =
-        getStackSum(index);
+        getSum(index);
 
       if (total < 20) {
-        slot.classList.add("target-valid");
+        slot.classList.add(
+          "target-valid"
+        );
       }
     }
   });
 }
 
 
-function clearDropTargets() {
+/* =========================================================
+   ドロップ先の強調を解除
+========================================================= */
 
-  document
+function clearDropTargets(
+  targetFieldArea = fieldArea
+) {
+
+  targetFieldArea
     .querySelectorAll(".target-valid")
     .forEach(element => {
-      element.classList.remove("target-valid");
+
+      element.classList.remove(
+        "target-valid"
+      );
     });
 }
 
@@ -2768,6 +3575,912 @@ document
  * 設定画面を開いたときに現在の設定を表示
  */
 updateSoundSettingUI();
+
+
+ /* =========================================================
+    2人対戦：カード描画
+ ========================================================= */
+
+ function renderBattleCard(card, extraClass = "") {
+
+   const element =
+     createCardElement(
+       card,
+       extraClass
+     );
+
+   return element;
+ }
+
+
+ 
+function toggleBattleSetSelection(fieldIndex) {
+  if (!battleGame.inProgress) {
+    return;
+  }
+
+  const field = battleGame.field[fieldIndex];
+
+  if (!field || field.stack.length === 0) {
+    return;
+  }
+
+  const total =
+    field.base.value +
+    field.stack.reduce(
+      (sum, card) => sum + card.value,
+      0
+    );
+
+  // 合計が10または20でないセットは選択できない
+  if (total !== 10 && total !== 20) {
+    return;
+  }
+
+  const selectedIndex =
+    battleGame.selectedSets.indexOf(fieldIndex);
+
+  if (selectedIndex !== -1) {
+    // 選択済みなら解除
+    battleGame.selectedSets.splice(selectedIndex, 1);
+  } else {
+    // 最大2セットまで
+    if (battleGame.selectedSets.length >= 2) {
+      return;
+    }
+
+    battleGame.selectedSets.push(fieldIndex);
+  }
+
+  renderBattleField();
+}
+
+
+ /* =========================================================
+    2人対戦：場札描画
+ ========================================================= */
+
+ function renderBattleField() {
+
+   const battleField =
+     document.querySelector(
+       "#battle-test-screen .battle-field"
+     );
+
+   if (!battleField) {
+     return;
+   }
+
+   battleField.innerHTML = "";
+
+   battleGame.field.forEach(
+     (field, fieldIndex) => {
+
+       if (!field) {
+         return;
+       }
+
+       const slot =
+         document.createElement("div");
+
+       slot.className =
+         "battle-field-slot";
+
+       if (battleGame.selectedSets.includes(fieldIndex)) {
+         slot.classList.add("battle-set-selected");
+       }
+
+       /*
+        * 場札本体
+        */
+       const base =
+         renderBattleCard(
+           field.base,
+           "battle-field-card"
+         );
+
+       slot.appendChild(base);
+
+       base.addEventListener("click", () => {
+         toggleBattleSetSelection(fieldIndex);
+         });
+
+
+       /*
+        * セット作成中のカード
+        */
+       const stack =
+         document.createElement("div");
+
+       stack.className =
+         "battle-building-set";
+
+
+       field.stack.forEach(
+         (card, stackIndex) => {
+
+           const element =
+  renderBattleCard(
+    card,
+    "battle-set-card"
+  );
+
+element.style.top =
+  `calc(var(--battle-card-height) * ${0.30 * (stackIndex + 1)})`;
+
+element.style.zIndex =
+  String(stackIndex + 2);
+
+stack.appendChild(element);
+
+addBattleStackDragEvents(
+  element,
+  fieldIndex,
+  stackIndex
+);
+         }
+       );
+
+
+       if (field.stack.length > 0) {
+         slot.appendChild(stack);
+       }
+
+
+       /*
+        * 合計表示
+        */
+             if (field.stack.length > 0) {
+
+        const total =
+          field.base.value +
+          field.stack.reduce(
+            (sum, card) =>
+              sum + card.value,
+            0
+          );
+
+        const totalElement =
+          document.createElement("div");
+
+        totalElement.className =
+          "battle-stack-total";
+
+        if (total === 10 || total === 20) {
+
+          totalElement.classList.add("valid");
+          totalElement.textContent = total;
+
+        } else if (total > 20) {
+
+          totalElement.classList.add("over");
+          totalElement.textContent = total;
+
+        }
+
+        slot.appendChild(totalElement);
+
+      }
+
+
+       battleField.appendChild(slot);
+     }
+   );
+ }
+
+
+ /* =========================================================
+   2人対戦：手札描画
+========================================================= */
+
+function renderBattleHands() {
+
+  const handAreas =
+    document.querySelectorAll(
+      "#battle-test-screen .battle-hand"
+    );
+
+  if (handAreas.length < 2) {
+    return;
+  }
+
+  handAreas.forEach(
+    (handArea, playerIndex) => {
+
+      handArea.innerHTML = "";
+
+      const hand =
+        battleGame.players[
+          playerIndex
+        ].hand;
+
+      hand.forEach(
+        (card, handIndex) => {
+
+          const element =
+            renderBattleCard(
+              card,
+              "battle-hand-card"
+            );
+
+          handArea.appendChild(
+            element
+          );
+
+          addHandDragEvents(
+            element,
+            handIndex,
+            {
+              getHand: () =>
+                battleGame.players[
+                  playerIndex
+                ].hand,
+
+              isActive: () =>
+  battleGame.inProgress &&
+  battleGame.currentPlayer === playerIndex &&
+  battleGame.hasDrawn,
+
+              getDraggingState: () =>
+                battleGame,
+
+            highlightDropTargets:
+  (x, y) => {
+
+    highlightBattleDropTargets(
+      x,
+      y,
+      playerIndex
+    );
+
+  },
+
+              clearDropTargets:
+  clearBattleDropTargets,
+
+              getFieldAtPoint:
+  (x, y) => {
+
+    return getBattleFieldAtPoint(
+      x,
+      y
+    );
+  },
+
+              addCardToField:
+                (index, fieldIndex) => {
+
+                  addBattleCardToField(
+                    playerIndex,
+                    index,
+                    fieldIndex
+                  );
+                }
+            }
+          );
+        }
+      );
+    }
+  );
+}
+
+
+/* =========================================================
+   2人対戦：ドロップ可能な場札を光らせる
+========================================================= */
+
+function highlightBattleDropTargets(
+  x,
+  y,
+  playerIndex
+) {
+  clearBattleDropTargets();
+
+  const fieldArea =
+    document.querySelector(
+      "#battle-test-screen .battle-field"
+    );
+
+  if (!fieldArea) {
+    return;
+  }
+
+  const dragging =
+    battleGame.dragging;
+
+  if (
+    !dragging ||
+    !dragging.card
+  ) {
+    return;
+  }
+
+  const fieldIndex =
+    getBattleFieldAtPoint(x, y);
+
+  if (fieldIndex === -1) {
+    return;
+  }
+
+  const field =
+    battleGame.field[fieldIndex];
+
+  if (!field) {
+    return;
+  }
+
+  const current =
+    getBattleStackSum(fieldIndex);
+
+  const next =
+    current + dragging.card.value;
+
+  
+
+  const slots =
+    fieldArea.querySelectorAll(
+      ".battle-field-slot"
+    );
+
+  const slot =
+    slots[fieldIndex];
+
+  if (!slot) {
+    return;
+  }
+
+  // 有効な場札を光らせる
+  slot.classList.add(
+    "battle-target-valid"
+  );
+
+  // ↓を表示
+  const arrow =
+    document.createElement("div");
+
+  arrow.className =
+    "battle-drop-arrow";
+
+  arrow.textContent = "↓";
+
+  slot.appendChild(arrow);
+}
+
+function highlightBattleStackDropTargets(
+  x,
+  y,
+  sourceFieldIndex,
+  stackIndex
+) {
+  clearBattleDropTargets();
+
+  const fieldArea =
+    document.querySelector(
+      "#battle-test-screen .battle-field"
+    );
+
+  if (!fieldArea) return;
+
+  const source =
+    battleGame.field[sourceFieldIndex];
+
+  if (
+    !source ||
+    !source.stack[stackIndex]
+  ) {
+    return;
+  }
+
+  const card =
+    source.stack[stackIndex];
+
+  const targetIndex =
+    getBattleFieldAtPoint(x, y);
+
+  if (targetIndex === -1) return;
+
+  // 移動元自身は対象にしない
+  if (targetIndex === sourceFieldIndex) {
+    return;
+  }
+
+  const slots =
+    fieldArea.querySelectorAll(
+      ".battle-field-slot"
+    );
+
+  const slot = slots[targetIndex];
+
+  if (!slot) return;
+
+  // 移動先の合計を計算
+  const current =
+    getBattleStackSum(targetIndex);
+
+  // 移動元から取り除いた後の合計を考慮
+  const next = current + card.value;
+
+  slot.classList.add(
+    "battle-target-valid"
+  );
+
+  const arrow =
+    document.createElement("div");
+
+  arrow.className =
+    "battle-drop-arrow";
+
+  arrow.textContent = "↓";
+
+  slot.appendChild(arrow);
+}
+
+
+/* =========================================================
+   2人対戦：ドロップ先表示を消す
+========================================================= */
+
+function clearBattleDropTargets() {
+
+  const fieldArea =
+    document.querySelector(
+      "#battle-test-screen .battle-field"
+    );
+
+  if (!fieldArea) {
+    return;
+  }
+
+  fieldArea
+    .querySelectorAll(
+      ".battle-target-valid"
+    )
+    .forEach(slot => {
+
+      slot.classList.remove(
+        "battle-target-valid"
+      );
+    });
+
+  fieldArea
+    .querySelectorAll(
+      ".battle-drop-arrow"
+    )
+    .forEach(arrow => {
+
+      arrow.remove();
+    });
+}
+
+/* =========================================================
+   2人対戦：そのカードを置いた後の合計
+========================================================= */
+
+function getBattleNextSum(
+  fieldIndex,
+  card
+) {
+
+  const current =
+    getBattleStackSum(fieldIndex);
+
+  if (!card) {
+    return current;
+  }
+
+  return current + card.value;
+}
+
+
+ /* =========================================================
+    2人対戦：画面全体
+ ========================================================= */
+
+ 
+
+function renderBattle() {
+  renderBattleField();
+  renderBattleHands();
+  renderBattleControls();
+
+  const deckCount = document.querySelector(
+    "#battle-test-screen .battle-deck-count"
+  );
+
+  if (deckCount) {
+    deckCount.textContent = battleGame.deck.length;
+  }
+}
+
+
+function renderBattleControls() {
+  const areas = document.querySelectorAll(
+    "#battle-test-screen .battle-player-area"
+  );
+
+  areas.forEach((area, playerIndex) => {
+    const isActive =
+      battleGame.inProgress &&
+      battleGame.currentPlayer === playerIndex;
+
+    const drawButton = area.querySelector(".battle-draw");
+    const passButton = area.querySelector(".battle-pass");
+    const confirmButton = area.querySelector(".battle-confirm");
+
+    if (drawButton) {
+      drawButton.style.display =
+        isActive && !battleGame.hasDrawn ? "" : "none";
+    }
+
+    if (passButton) {
+      passButton.style.display =
+        isActive && battleGame.hasDrawn ? "" : "none";
+    }
+
+    if (confirmButton) {
+      confirmButton.style.display =
+        isActive && battleGame.hasDrawn ? "" : "none";
+    }
+  });
+}
+
+
+ 
+async function confirmBattleSets() {
+  if (!battleGame.inProgress) return;
+
+  const playerIndex = battleGame.currentPlayer;
+  const hand = battleGame.players[playerIndex].hand;
+
+  // 選択したセットを確認
+  
+const selected = [...battleGame.selectedSets];
+
+if (selected.length === 0) {
+  await showMessage(
+    "セットの一番上のカードをタップしてください",
+    1200
+  );
+  return;
+}
+
+if (selected.length > 2) {
+  return;
+}
+
+
+  const setInfos = [];
+
+  for (const fieldIndex of selected) {
+    const field = battleGame.field[fieldIndex];
+    if (!field || field.stack.length === 0) return;
+
+    const total =
+      field.base.value +
+      field.stack.reduce((sum, card) => sum + card.value, 0);
+
+    if (total !== 10 && total !== 20) return;
+
+    setInfos.push({ fieldIndex, total });
+  }
+
+  // 決定音
+  playSound("decide");
+
+  // 完成したセットを順番に処理
+  for (const setInfo of setInfos) {
+    const field = battleGame.field[setInfo.fieldIndex];
+    if (!field) continue;
+
+    // 完成ポップアップと効果音
+    await showMessage(`${setInfo.total}完成！`, 1000);
+
+    // 場札と重ねたカードを墓地へ移動
+    battleGame.graveyard.push(field.base);
+
+    for (const card of field.stack) {
+      battleGame.graveyard.push(card);
+      playSound("grave");
+      renderBattle();
+      await wait(120);
+    }
+
+    // この場札を補充対象にする
+    battleGame.field[setInfo.fieldIndex] = null;
+    renderBattle();
+    await wait(150);
+  }
+
+  battleGame.selectedSets = [];
+
+  // 空いた場札を山札から補充
+  for (let i = 0; i < battleGame.field.length; i++) {
+    if (battleGame.field[i] !== null) continue;
+    if (battleGame.deck.length === 0) break;
+
+    const card = battleGame.deck.pop();
+    if (card) {
+      battleGame.field[i] = {
+        base: card,
+        stack: []
+      };
+      renderBattle();
+      await wait(220);
+    }
+  }
+
+  
+  renderBattle();
+
+  
+  // 未完成のセットに残ったカードを手札に戻す
+  battleGame.field.forEach(field => {
+    if (!field || !field.stack || field.stack.length === 0) return;
+
+    hand.push(...field.stack);
+    field.stack = [];
+  });
+
+  battleGame.selectedSets = [];
+  renderBattle();
+
+  // 未完成カードを戻した後で勝利判定
+  
+if (hand.length === 0) {
+  // プレイヤー1が最初のターンで上がった場合
+  if (
+    playerIndex === 0 &&
+    battleGame.turn === 1 &&
+    !battleGame.firstPlayerCleared
+  ) {
+    battleGame.firstPlayerCleared = true;
+
+    await showMessage(
+      "プレイヤー1が上がりました！プレイヤー2の挑戦です",
+      1500
+    );
+
+    await endBattleTurn();
+    return;
+  }
+
+  // プレイヤー1が最初のターンで上がり、
+  // プレイヤー2も次のターンで上がった場合
+  if (battleGame.firstPlayerCleared && playerIndex === 1) {
+    showBattleResult(
+  null,
+  "両プレイヤーが最初のターンで上がったから"
+);
+return;
+  }
+
+  // 通常の勝利
+  showBattleResult(
+  playerIndex,
+  "先に手札をなくしたから"
+);
+return;
+}
+
+await endBattleTurn();
+
+
+}
+
+
+
+
+function drawBattleCard(playerIndex, count = 1) {
+  if (!battleGame.inProgress) return 0;
+  if (playerIndex !== battleGame.currentPlayer) return 0;
+  if (count === 1 && battleGame.hasDrawn) return 0;
+
+  const hand = battleGame.players[playerIndex].hand;
+  let drawn = 0;
+
+  for (let i = 0; i < count; i++) {
+    if (battleGame.deck.length === 0) break;
+
+    const card = battleGame.deck.pop();
+    if (!card) break;
+
+    hand.push(card);
+    drawn++;
+  }
+
+  // 山札がなくても、ドロー操作を完了した扱いにする
+  if (count === 1) {
+    battleGame.hasDrawn = true;
+  }
+
+  renderBattle();
+  return drawn;
+}
+
+
+
+async function passBattleTurn() {
+  if (!battleGame.inProgress) return;
+
+  const playerIndex = battleGame.currentPlayer;
+
+  // パスのペナルティとして最大2枚引く
+  const drawn = drawBattleCard(playerIndex, 2);
+
+  if (drawn > 0) {
+    await showMessage(`${drawn}枚ドロー（パスのペナルティ）`, 1000);
+  } else {
+    await showMessage("山札がありません", 800);
+  }
+
+  await endBattleTurn();
+}
+
+
+function showBattleResult(winnerIndex, reason) {
+  battleGame.inProgress = false;
+
+  const battleScreen = document.getElementById("battle-test-screen");
+  const resultScreen = document.getElementById("battle-result-screen");
+
+  if (!battleScreen || !resultScreen) {
+    console.error("対戦結果画面のHTMLが見つかりません。");
+    return;
+  }
+
+  const hand1 = battleGame.players[0].hand.length;
+  const hand2 = battleGame.players[1].hand.length;
+
+  document.getElementById("battle-result-turn").textContent =
+    battleGame.turn;
+  document.getElementById("battle-result-hand1").textContent = hand1;
+  document.getElementById("battle-result-hand2").textContent = hand2;
+  document.getElementById("battle-result-reason-text").textContent =
+    reason;
+
+  const outcome1 = document.getElementById("battle-result-outcome1");
+  const outcome2 = document.getElementById("battle-result-outcome2");
+
+  outcome1.className = "battle-result-outcome";
+  outcome2.className = "battle-result-outcome";
+
+  if (winnerIndex === null) {
+    outcome1.textContent = "引き分け！";
+    outcome2.textContent = "引き分け！";
+    outcome1.classList.add("draw");
+    outcome2.classList.add("draw");
+  } else {
+    const winner = winnerIndex === 0 ? outcome1 : outcome2;
+    const loser = winnerIndex === 0 ? outcome2 : outcome1;
+
+    winner.textContent = "勝利！";
+    winner.classList.add("win");
+
+    loser.textContent = "敗北…";
+    loser.classList.add("lose");
+  }
+
+  renderBattle();
+
+  showScreen("battleResult");
+}
+
+
+async function endBattleTurn() {
+  if (!battleGame.inProgress) return;
+
+  // 未完成のカードを現在のプレイヤーの手札に戻す
+  const hand = battleGame.players[battleGame.currentPlayer].hand;
+
+  battleGame.field.forEach(field => {
+    if (!field || !field.stack || field.stack.length === 0) return;
+
+    hand.push(...field.stack);
+    field.stack = [];
+  });
+
+  battleGame.selectedSets = [];
+  renderBattle();
+
+  // 先攻が最初のターンで上がった場合の特別ルール
+  if (
+    battleGame.firstPlayerCleared &&
+    battleGame.currentPlayer === 1
+  ) {
+    showBattleResult(
+  0,
+  "プレイヤー1が先に上がり、プレイヤー2が上がれなかったから"
+);
+return;
+  }
+
+  
+  // 最終ターンが終了した場合、手札の枚数で判定
+  if (battleGame.lastTurn) {
+    const hand1 = battleGame.players[0].hand.length;
+    const hand2 = battleGame.players[1].hand.length;
+
+    if (hand1 < hand2) {
+      showBattleResult(
+        0,
+        "残り枚数が少なかったから"
+      );
+    } else if (hand2 < hand1) {
+      showBattleResult(
+        1,
+        "残り枚数が少なかったから"
+      );
+    } else {
+      showBattleResult(
+        null,
+        "残り枚数が同じだったから"
+      );
+    }
+
+    return;
+  }
+
+
+  // 次のプレイヤーへ交代
+  battleGame.currentPlayer = 1 - battleGame.currentPlayer;
+  battleGame.turn++;
+  battleGame.hasDrawn = false;
+
+  // 山札が0枚なら、今始まるターンを最終ターンにする
+  if (battleGame.deck.length === 0) {
+    battleGame.lastTurn = true;
+    renderBattle();
+    await showMessage("最終ターンです", 1000);
+    renderBattle();
+    return;
+  }
+
+  renderBattle();
+}
+
+
+
+
+
+
+
+document
+  .querySelectorAll("#battle-test-screen .battle-player-area")
+  .forEach((playerArea, playerIndex) => {
+    const drawButton = playerArea.querySelector(".battle-draw");
+    const passButton = playerArea.querySelector(".battle-pass");
+    const confirmButton = playerArea.querySelector(".battle-confirm");
+
+    
+if (drawButton) {
+  drawButton.addEventListener("click", async () => {
+    if (battleGame.currentPlayer !== playerIndex) return;
+
+    const drawn = drawBattleCard(playerIndex, 1);
+
+    if (drawn === 0 && battleGame.inProgress) {
+      await showMessage("0ドロー", 800);
+    }
+  });
+}
+
+
+    if (passButton) {
+      passButton.addEventListener("click", () => {
+        if (battleGame.currentPlayer !== playerIndex) return;
+        passBattleTurn();
+      });
+    }
+
+    if (confirmButton) {
+      confirmButton.addEventListener("click", () => {
+        if (battleGame.currentPlayer !== playerIndex) return;
+        confirmBattleSets();
+      });
+    }
+  });
+
+
 
 
 /* =========================================================
