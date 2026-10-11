@@ -1349,3 +1349,1073 @@ h1 {
 .sound-option:active {
   transform: scale(0.96);
 }
+
+
+/* =========================================================
+   対戦モード レイアウトテスト
+   上段：共有エリア
+   下段：左右プレイヤー
+========================================================= */
+
+#battle-test-screen {
+  --battle-card-height: min(15vh, 86px);
+  --battle-card-width: calc(var(--battle-card-height) * 0.75);
+
+  position: relative;
+
+  width: 100%;
+  min-height: 100vh;
+
+  box-sizing: border-box;
+
+  padding: 8px;
+
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   全体
+========================================================= */
+
+.battle-horizontal-layout {
+  width: 100%;
+  height: calc(100vh - 16px);
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+
+/* =========================================================
+   上段：共有ゲームエリア
+========================================================= */
+
+.battle-shared-area {
+  position: relative;
+
+  flex: 0 0 60%;
+
+  min-height: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: flex-start;
+
+  box-sizing: border-box;
+
+  border-bottom: 2px solid #888;
+}
+
+
+/* =========================================================
+   メニューへ
+========================================================= */
+
+.battle-menu-button {
+  position: absolute;
+
+  top: 4px;
+  left: 4px;
+
+  min-width: 92px;
+  min-height: 38px;
+
+  padding: 4px 10px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #666;
+  color: white;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  z-index: 10;
+}
+
+
+/* =========================================================
+   山札・場札・墓地
+========================================================= */
+
+.battle-shared-board {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 20px;
+  flex-shrink: 0;
+  margin-top: 32px;
+}
+
+
+/* =========================================================
+   カード共通
+========================================================= */
+
+#battle-test-screen .battle-card,
+#battle-test-screen .battle-set-card {
+  width: var(--battle-card-width);
+  height: var(--battle-card-height);
+
+  min-width: var(--battle-card-width);
+
+  box-sizing: border-box;
+
+  background: white;
+
+  border: 1.5px solid #555;
+  border-radius: 8px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  font-size: calc(var(--battle-card-width) * 0.38);
+
+  font-weight: 900;
+
+  box-shadow:
+    0 2px 4px rgba(0,0,0,0.15);
+}
+
+
+/* =========================================================
+   山札・墓地
+========================================================= */
+
+.battle-small-stack {
+  width: var(--battle-card-width);
+  height: var(--battle-card-height);
+
+  box-sizing: border-box;
+
+  border-radius: 8px;
+
+  border: 1.5px solid #555;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  font-weight: 800;
+}
+
+.battle-deck {
+  color: white;
+
+  background:
+    linear-gradient(
+      45deg,
+      transparent 46%,
+      rgba(255,255,255,0.22) 47%,
+      rgba(255,255,255,0.22) 53%,
+      transparent 54%
+    ),
+    linear-gradient(
+      -45deg,
+      transparent 46%,
+      rgba(255,255,255,0.22) 47%,
+      rgba(255,255,255,0.22) 53%,
+      transparent 54%
+    ),
+    #2868b2;
+
+  background-size: 16px 16px;
+
+  box-shadow:
+    inset 0 0 0 4px rgba(255,255,255,0.75),
+    inset 0 0 0 7px #2868b2;
+}
+
+.battle-grave {
+  background: white;
+}
+
+.battle-stack-title {
+  font-size: calc(var(--battle-card-width) * 0.18);
+}
+
+.battle-deck-count,
+.battle-grave-card {
+  font-size: calc(var(--battle-card-width) * 0.28);
+  margin-top: 3px;
+}
+
+
+/* =========================================================
+   場札4枚
+========================================================= */
+
+.battle-field {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, var(--battle-card-width));
+
+  gap: 4px;
+
+  flex-shrink: 0;
+}
+
+
+/* =========================================================
+   ターン表示
+========================================================= */
+
+.battle-turn-display {
+  margin-top: 6px;
+
+  font-size: clamp(14px, 2.4vw, 18px);
+
+  font-weight: 800;
+}
+
+
+/* =========================================================
+   下段：左右プレイヤー
+========================================================= */
+
+.battle-players-area {
+  flex: 1 1 40%;
+
+  min-height: 0;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1fr);
+
+  gap: 4px;
+}
+
+
+/* =========================================================
+   プレイヤー個別エリア
+========================================================= */
+
+.battle-player-area {
+  min-width: 0;
+  min-height: 0;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding: 4px;
+
+  box-sizing: border-box;
+
+  border-radius: 8px;
+}
+
+.battle-player-left {
+  background: rgba(220,220,220,0.28);
+
+  border-right: 1px solid #999;
+}
+
+.battle-player-right {
+  background: rgba(47,128,237,0.10);
+
+  border-left: 1px solid #999;
+}
+
+.battle-player-right.active-player {
+  background: rgba(47,128,237,0.18);
+}
+
+
+/* =========================================================
+   プレイヤー名
+========================================================= */
+
+.battle-player-name {
+  font-size: clamp(14px, 2.2vw, 18px);
+
+  font-weight: 800;
+
+  padding: 2px 0 4px;
+
+  flex-shrink: 0;
+}
+
+
+/* =========================================================
+   手札
+========================================================= */
+
+.battle-hand {
+  width: 100%;
+
+  max-width:
+    calc(var(--battle-card-width) * 5 + 24px);
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  flex: 1 1 auto;
+
+  min-height: 0;
+
+  padding: 3px;
+
+  box-sizing: border-box;
+
+  overflow: hidden;
+}
+
+.battle-hand-row {
+  width: 100%;
+
+  display: flex;
+
+  justify-content: center;
+  align-items: flex-start;
+
+  gap: 4px;
+}
+
+.battle-hand-row-second {
+  margin-top: -18%;
+}
+
+
+/* =========================================================
+   プレイヤー操作ボタン
+========================================================= */
+
+.battle-player-controls {
+  width: 100%;
+
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+
+  gap: 5px;
+
+  flex-shrink: 0;
+}
+
+.battle-button {
+  min-width: 72px;
+  min-height: 40px;
+
+  padding: 4px 8px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #2f80ed;
+
+  color: white;
+
+  font-size: clamp(13px, 2vw, 16px);
+
+  font-weight: 700;
+}
+
+.battle-confirm {
+  background: #219653;
+}
+
+
+
+/* =========================================================
+   縦向き時
+========================================================= */
+
+.battle-rotate-message {
+  display: none;
+}
+
+@media (orientation: portrait) {
+
+  #battle-test-screen .battle-horizontal-layout {
+    display: none;
+  }
+
+  #battle-test-screen .battle-rotate-message {
+    position: fixed;
+    inset: 0;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+    padding: 20px;
+    box-sizing: border-box;
+
+    background: white;
+
+    font-size: 20px;
+    font-weight: 800;
+
+    text-align: center;
+    z-index: 200;
+  }
+
+  .battle-rotate-message small {
+    font-size: 14px;
+    font-weight: 500;
+  }
+}
+
+
+
+/* =========================================================
+   小さい横長スマートフォン
+========================================================= */
+
+@media (orientation: landscape) and (max-height: 420px) {
+
+  #battle-test-screen {
+    --battle-card-height: 14vh;
+  }
+
+  .battle-menu-button {
+    min-width: 82px;
+    min-height: 34px;
+
+    font-size: 13px;
+  }
+
+  .battle-button {
+    min-width: 62px;
+    min-height: 36px;
+
+    font-size: 13px;
+  }
+}
+
+
+/* =========================================================
+   タブレット横向き
+========================================================= */
+
+@media (orientation: landscape) and (min-height: 600px) {
+
+  #battle-test-screen {
+    --battle-card-height: min(15vh, 105px);
+  }
+
+  .battle-player-controls {
+    gap: 8px;
+  }
+
+  .battle-button {
+    min-width: 82px;
+    min-height: 44px;
+  }
+}
+
+/* =========================================================
+   セット作成中の場札
+========================================================= */
+
+.battle-field-slot {
+  position: relative;
+
+  width: var(--battle-card-width);
+  height: var(--battle-card-height);
+
+  flex-shrink: 0;
+}
+
+.battle-field-slot .battle-card {
+  position: relative;
+  z-index: 2;
+}
+
+
+/* =========================
+   セット作成中のカード
+   ========================= */
+
+.battle-field-slot-active {
+  position: relative;
+  overflow: visible;
+}
+
+/* 場札を一番下の基準カードにする */
+.battle-field-slot-active .battle-field-card {
+  position: relative;
+  z-index: 1;
+}
+
+/* 重ねるカード全体 */
+.battle-building-set {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--battle-card-width);
+  height: calc(var(--battle-card-height) * 3);
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* すべて同じ横位置。
+   下へ一定量ずつ移動させる */
+.battle-building-set .battle-set-card {
+  position: absolute;
+
+  width: var(--battle-card-width) !important;
+  height: var(--battle-card-height) !important;
+  min-width: var(--battle-card-width) !important;
+
+  box-sizing: border-box;
+
+  background: #fff;
+  border: 2px solid #2f80ed;
+  border-radius: 8px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: calc(var(--battle-card-width) * 0.38) !important;
+  font-weight: 900;
+
+  box-shadow: 0 2px 5px rgba(0,0,0,0.20);
+}
+
+/* 1枚目 */
+.battle-set-card-1 {
+  top: calc(var(--battle-card-height) * 0.3);
+  z-index: 3;
+}
+
+/* 2枚目 */
+.battle-set-card-2 {
+  top: calc(var(--battle-card-height) * 0.6);
+  z-index: 4;
+}
+
+/* 3枚目 */
+.battle-set-card-3 {
+  top: calc(var(--battle-card-height) * 0.9);
+  z-index: 5;
+}
+
+/* カード右上の数字 */
+.battle-set-rank {
+  position: absolute;
+  top: 5px;
+  right: 6px;
+
+  font-size: calc(var(--battle-card-width) * 0.25);
+  line-height: 1;
+  font-weight: 900;
+
+  z-index: 10;
+}
+
+/* =========================================================
+   2人対戦用カードサイズ
+========================================================= */
+
+.battle-horizontal-layout {
+  --battle-card-height: clamp(
+    70px,
+    10vh,
+    125px
+  );
+
+  --battle-card-width:
+    calc(var(--battle-card-height) * 0.75);
+}
+
+/* =========================================================
+   2人対戦カード
+========================================================= */
+
+.battle-horizontal-layout .playing-card {
+  width: var(--battle-card-width);
+  height: var(--battle-card-height);
+  min-width: var(--battle-card-width);
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   2人対戦：手札
+========================================================= */
+
+.battle-hand {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 4px;
+  width: 100%;
+  min-width: 0;
+  overflow: visible;
+}
+
+.battle-hand-card {
+  flex: 0 0 var(--battle-card-width);
+}
+
+/* =========================================================
+   2人対戦：カード内部のサイズ
+========================================================= */
+
+.battle-horizontal-layout .card-corner {
+  font-size: calc(
+    var(--battle-card-width) * 0.22
+  );
+  line-height: 1;
+}
+
+.battle-horizontal-layout .card-corner-suit {
+  font-size: calc(
+    var(--battle-card-width) * 0.3
+  );
+}
+
+.battle-horizontal-layout .pip {
+  font-size: calc(
+    var(--battle-card-width) * 0.16
+  );
+}
+
+.battle-horizontal-layout .pip-grid {
+  gap: 2px;
+}
+
+.battle-horizontal-layout .pip-row {
+  gap: 2px;
+}
+
+.battle-player {
+  position: relative;
+  z-index: 20;
+}
+
+.battle-player-controls {
+  position: relative;
+  z-index: 50;
+  background: #fff;
+  padding: 4px 0;
+}
+
+.battle-field-slot.battle-target-valid {
+  filter:
+    drop-shadow(
+      0 0 10px rgba(47, 128, 237, 0.95)
+    );
+}
+
+.battle-field-slot.battle-target-valid {
+  outline: 4px solid #2f80ed;
+  outline-offset: 4px;
+  border-radius: 10px;
+}
+
+.battle-drop-arrow {
+  position: absolute;
+
+  left: 50%;
+  top: calc(var(--battle-card-height) * 0.88);
+
+  transform: translateX(-50%);
+
+  font-size: 32px;
+  line-height: 1;
+
+  font-weight: 900;
+  color: #2f80ed;
+
+  z-index: 100;
+
+  pointer-events: none;
+}
+
+.battle-field-slot.battle-target-valid {
+  outline: 4px solid #2f80ed;
+  outline-offset: 4px;
+  border-radius: 10px;
+}
+
+.battle-drop-arrow {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--battle-card-height) * 0.88);
+  transform: translateX(-50%);
+
+  font-size: 32px;
+  line-height: 1;
+  font-weight: 900;
+
+  color: #2f80ed;
+
+  z-index: 100;
+  pointer-events: none;
+}
+
+.battle-stack-total {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  transform: translateX(-50%);
+
+  font-size: 24px;
+  font-weight: 900;
+  line-height: 1.2;
+
+  color: #333;
+  white-space: nowrap;
+
+  z-index: 30;
+  pointer-events: none;
+}
+
+.battle-stack-total.valid {
+  color: #2f80ed;
+}
+
+.battle-stack-total.over {
+  color: #e53935;
+}
+
+.battle-building-set .battle-set-card {
+  pointer-events: auto;
+  touch-action: none;
+  cursor: grab;
+}
+
+.battle-building-set .battle-set-card:active {
+  cursor: grabbing;
+}
+
+
+/* 2人対戦：確定対象として選択したセット */
+.battle-field-slot.battle-set-selected {
+  outline: 4px solid #f2c94c;
+  outline-offset: 4px;
+  border-radius: 10px;
+  filter: drop-shadow(0 0 8px rgba(242, 201, 76, 0.8));
+}
+
+
+/* 対戦結果画面 */
+#battle-result-screen {
+  box-sizing: border-box;
+  min-height: 100vh;
+  padding: 24px 20px 100px;
+}
+
+#battle-result-screen.hidden {
+  display: none;
+}
+
+.battle-result-content {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.battle-result-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.battle-result-header h2 {
+  margin: 0 0 8px;
+  font-size: clamp(26px, 4vw, 36px);
+}
+
+.battle-result-header p {
+  margin: 0;
+  font-size: 18px;
+}
+
+.battle-result-players {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border: 1px solid #d5dce5;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.battle-result-player {
+  padding: 28px 12px;
+  text-align: center;
+  min-width: 0;
+}
+
+.battle-result-player + .battle-result-player {
+  border-left: 1px solid #d5dce5;
+}
+
+.battle-result-player h3 {
+  margin: 0 0 18px;
+  font-size: clamp(18px, 2.5vw, 25px);
+}
+
+.battle-result-player p {
+  margin: 0 0 22px;
+  font-size: clamp(15px, 2vw, 19px);
+}
+
+.battle-result-outcome {
+  font-size: clamp(27px, 5vw, 42px);
+  font-weight: 800;
+}
+
+.battle-result-outcome.win {
+  color: #16834a;
+}
+
+.battle-result-outcome.lose {
+  color: #b54747;
+}
+
+.battle-result-outcome.draw {
+  color: #2868b2;
+}
+
+.battle-result-reason {
+  margin-top: 24px;
+  padding: 18px;
+  background: #f1f4f8;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.battle-result-reason h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+  color: #586579;
+}
+
+.battle-result-reason p {
+  margin: 0;
+  font-size: clamp(16px, 2.5vw, 20px);
+  font-weight: 600;
+}
+
+.battle-result-bottom-buttons {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  gap: 12px;
+  padding: 12px 16px;
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+  background: #fff;
+  border-top: 1px solid #d5dce5;
+  z-index: 1000;
+}
+
+.battle-result-button {
+  flex: 1;
+  min-width: 0;
+  min-height: 54px;
+  border: none;
+  border-radius: 10px;
+  background: #2868b2;
+  color: #fff;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+@media (max-width: 480px) {
+  #battle-result-screen {
+    padding: 18px 12px 94px;
+  }
+
+  .battle-result-player {
+    padding: 22px 6px;
+  }
+
+  .battle-result-bottom-buttons {
+    gap: 8px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .battle-result-button {
+    font-size: 15px;
+  }
+}
+
+
+/* 2人で対戦メニュー */
+#versus-menu-screen {
+  box-sizing: border-box;
+  min-height: 100vh;
+  padding: 32px 20px;
+  text-align: center;
+}
+
+#versus-menu-screen.hidden {
+  display: none;
+}
+
+#versus-menu-screen h2 {
+  margin: 12px 0 36px;
+  font-size: clamp(28px, 4vw, 38px);
+}
+
+.versus-menu-players {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(8px, 3vw, 28px);
+  max-width: 650px;
+  margin: 0 auto;
+}
+
+.versus-menu-player {
+  flex: 1;
+  min-width: 0;
+  padding: 24px 8px;
+  border: 2px solid #d5dce5;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.versus-menu-player.player1 {
+  border-color: #2868b2;
+}
+
+.versus-menu-player.player2 {
+  border-color: #b54747;
+}
+
+.versus-menu-icon {
+  font-size: clamp(42px, 8vw, 64px);
+}
+
+.versus-menu-player h3 {
+  margin: 12px 0 0;
+  font-size: clamp(16px, 2.5vw, 23px);
+  overflow-wrap: anywhere;
+}
+
+.versus-menu-vs {
+  flex-shrink: 0;
+  font-size: clamp(22px, 4vw, 32px);
+  font-weight: 800;
+}
+
+.versus-menu-description {
+  margin: 28px 0;
+  font-size: clamp(15px, 2.5vw, 19px);
+}
+
+#versus-menu-screen #battle-start-button,
+#versus-menu-screen #versus-menu-back-button {
+  display: block;
+  width: 100%;
+  max-width: 420px;
+  min-height: 54px;
+  margin: 14px auto;
+  box-sizing: border-box;
+}
+
+@media (max-width: 480px) {
+  #versus-menu-screen {
+    padding: 24px 14px;
+  }
+
+  .versus-menu-player {
+    padding: 20px 4px;
+  }
+}
+
+
+/* 対戦終了の確認ポップアップ */
+#battle-exit-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+  box-sizing: border-box;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+#battle-exit-overlay.hidden {
+  display: none !important;
+}
+
+.battle-exit-dialog {
+  width: 100%;
+  max-width: 360px;
+  box-sizing: border-box;
+  padding: 24px 20px;
+
+  background: #ffffff;
+  color: #333333;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
+}
+
+.battle-exit-dialog h2 {
+  margin: 0 0 16px;
+  font-size: 21px;
+}
+
+.battle-exit-dialog p {
+  margin: 0 0 24px;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.battle-exit-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.battle-exit-buttons button {
+  flex: 1;
+  min-height: 48px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+#battle-exit-cancel {
+  background: #e5e7eb;
+  color: #333333;
+}
+
+#battle-exit-ok {
+  background: #2875c7;
+  color: #ffffff;
+}
+
