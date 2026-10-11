@@ -192,6 +192,258 @@
 </div>
 
     </section>
+    
+
+
+<!-- ==================== 2人で対戦メニュー ==================== -->
+<section id="versus-menu-screen" class="screen">
+  <h2>2人で対戦</h2>
+
+  <div class="versus-menu-players">
+    <div class="versus-menu-player player1">
+      <div class="versus-menu-icon">🧑</div>
+      <h3>プレイヤー1</h3>
+    </div>
+
+    <div class="versus-menu-vs">VS</div>
+
+    <div class="versus-menu-player player2">
+      <div class="versus-menu-icon">🧑</div>
+      <h3>プレイヤー2</h3>
+    </div>
+  </div>
+
+  <p class="versus-menu-description">
+    交互にカードを出して、先に手札をなくそう！
+  </p>
+
+  <button id="battle-start-button" class="main-button">
+    ゲームスタート
+  </button>
+
+  <button id="versus-menu-back-button" class="sub-button">
+    メニューへ戻る
+  </button>
+</section>
+
+
+<!-- ==================== 対戦画面レイアウトテスト ==================== -->
+<section id="battle-test-screen" class="screen">
+
+ <!-- 縦向き時の案内 -->
+    <div class="battle-rotate-message">
+      <div>横向きでプレイしてください</div>
+      <small>この対戦モードは横長画面を使用します</small>
+    </div>
+
+
+  <div class="battle-horizontal-layout">
+
+    <!-- =========================
+     上段：共有ゲームエリア
+========================== -->
+<div class="battle-shared-area">
+
+  <!-- メニューへ -->
+  <button class="battle-menu-button">
+  対戦メニューへ
+</button>
+
+  <!-- 共有ゲーム情報 -->
+  <div class="battle-shared-board">
+
+    <!-- 山札 -->
+    <div class="battle-small-stack battle-deck">
+      <div class="battle-stack-title">山札</div>
+      <div class="battle-deck-count">0</div>
+    </div>
+
+    <!-- 場札 -->
+    <div class="battle-field">
+
+  <div class="battle-field-slot">
+    <div class="battle-card">4</div>
+  </div>
+
+  <div class="battle-field-slot">
+    <div class="battle-card">6</div>
+  </div>
+
+  <div class="battle-field-slot">
+    <div class="battle-card">2</div>
+  </div>
+
+  <!-- セット作成中 -->
+  <div class="battle-field-slot battle-field-slot-active">
+
+    <!-- 場札 -->
+    <div class="battle-card battle-field-card">4</div>
+
+    <!-- 重ねるカード -->
+    <div class="battle-building-set">
+
+      <div class="battle-set-card battle-set-card-1">
+        <span class="battle-set-rank">1</span>
+        <span>1</span>
+      </div>
+
+      <div class="battle-set-card battle-set-card-2">
+        <span class="battle-set-rank">2</span>
+        <span>2</span>
+      </div>
+
+      <div class="battle-set-card battle-set-card-3">
+        <span class="battle-set-rank">3</span>
+        <span>3</span>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+    <!-- 墓地 -->
+    <div class="battle-small-stack battle-grave">
+      <div class="battle-stack-title">墓地</div>
+      <div class="battle-grave-card">10</div>
+    </div>
+
+  </div>
+
+  <!-- ターン表示 -->
+  <div class="battle-turn-display">
+    第5ターン　プレイヤー2の番
+  </div>
+
+</div>
+
+
+    <!-- =========================
+         下段：プレイヤーエリア
+    ========================== -->
+    <div class="battle-players-area">
+
+      <!-- =====================
+           プレイヤー1
+      ====================== -->
+      <div class="battle-player-area battle-player-left">
+
+        <div class="battle-player-name">
+          プレイヤー1
+        </div>
+
+        <div class="battle-hand">
+
+          <div class="battle-hand-row">
+            <div class="battle-card">1</div>
+            <div class="battle-card">5</div>
+            <div class="battle-card">7</div>
+            <div class="battle-card">3</div>
+            <div class="battle-card">9</div>
+          </div>
+
+          <div class="battle-hand-row battle-hand-row-second">
+            <div class="battle-card">2</div>
+            <div class="battle-card">4</div>
+            <div class="battle-card">8</div>
+          </div>
+
+        </div>
+
+        
+<div class="battle-player-controls">
+  <button class="battle-button battle-draw">ドロー</button>
+  <button class="battle-button battle-pass">パス</button>
+  <button class="battle-button battle-confirm">決定</button>
+</div>
+
+
+      </div>
+
+
+      <!-- =====================
+           プレイヤー2
+      ====================== -->
+      <div class="battle-player-area battle-player-right active-player">
+
+        <div class="battle-player-name">
+          プレイヤー2
+        </div>
+
+        <div class="battle-hand">
+
+          <div class="battle-hand-row">
+            <div class="battle-card">6</div>
+            <div class="battle-card">1</div>
+            <div class="battle-card">4</div>
+            <div class="battle-card">9</div>
+            <div class="battle-card">5</div>
+          </div>
+
+          <div class="battle-hand-row battle-hand-row-second">
+            <div class="battle-card">3</div>
+            <div class="battle-card">7</div>
+            <div class="battle-card">2</div>
+          </div>
+
+        </div>
+
+        
+<div class="battle-player-controls">
+  <button class="battle-button battle-draw">ドロー</button>
+  <button class="battle-button battle-pass">パス</button>
+  <button class="battle-button battle-confirm">決定</button>
+</div>
+
+
+      </div>
+
+    </div>
+
+
+   
+
+</section>
+
+
+<!-- 対戦結果画面 -->
+<section id="battle-result-screen" class="screen">
+  <div class="battle-result-content">
+    <header class="battle-result-header">
+      <h2>対戦結果</h2>
+      <p>ターン数 <span id="battle-result-turn">0</span></p>
+    </header>
+
+    <div class="battle-result-players">
+      <div class="battle-result-player" id="battle-result-player1">
+        <h3>プレイヤー1</h3>
+        <p>残り手札 <span id="battle-result-hand1">0</span>枚</p>
+        <div class="battle-result-outcome" id="battle-result-outcome1">勝利！</div>
+      </div>
+
+      <div class="battle-result-player" id="battle-result-player2">
+        <h3>プレイヤー2</h3>
+        <p>残り手札 <span id="battle-result-hand2">0</span>枚</p>
+        <div class="battle-result-outcome" id="battle-result-outcome2">敗北…</div>
+      </div>
+    </div>
+
+    <div class="battle-result-reason">
+      <h3>勝敗の決まり方</h3>
+      <p id="battle-result-reason-text"></p>
+    </div>
+  </div>
+
+  <div class="battle-result-bottom-buttons">
+    <button id="battle-result-menu" class="battle-result-button">
+      メニューへ
+    </button>
+    <button id="battle-result-replay" class="battle-result-button">
+      もう一度対戦
+    </button>
+  </div>
+</section>
 
 
     <!-- ==================== 完成ポップアップ ==================== -->
@@ -509,14 +761,22 @@
 
   </div>
 
-  <script src="game.js"></script>
+ 
 
-</body>
-</html>
-
+  
+<!-- 対戦終了の確認ポップアップ -->
+<div id="battle-exit-overlay" class="hidden">
+  <div class="battle-exit-dialog">
+    <h2>対戦を終了しますか？</h2>
+    <p>ゲームの途中ですが、終了して対戦メニューへ戻りますか？</p>
+    <div class="battle-exit-buttons">
+      <button id="battle-exit-cancel">キャンセル</button>
+      <button id="battle-exit-ok">OK</button>
+    </div>
   </div>
+</div>
 
-  <script src="game.js"></script>
+ <script src="game.js"></script>
 
 </body>
 </html>
