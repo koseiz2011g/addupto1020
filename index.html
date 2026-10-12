@@ -303,11 +303,15 @@
 
 </div>
 
-    <!-- 墓地 -->
-    <div class="battle-small-stack battle-grave">
-      <div class="battle-stack-title">墓地</div>
-      <div class="battle-grave-card">10</div>
-    </div>
+  
+<!-- 墓地 -->
+<div class="battle-small-stack battle-grave">
+  <div class="battle-stack-title">墓地</div>
+  <button type="button"
+          class="battle-grave-card"
+          aria-label="墓地を開く">－</button>
+</div>
+
 
   </div>
 
@@ -586,6 +590,28 @@
       </div>
 
     </div>
+
+
+<!-- ==================== 対戦モード 墓地確認 ==================== -->
+<div id="battle-graveyard-overlay" class="overlay hidden">
+
+  <div class="overlay-panel">
+
+    <h2>墓地</h2>
+
+    <div id="battle-graveyard-history" class="graveyard-history">
+    </div>
+
+    <button
+      id="battle-close-graveyard-button"
+      class="sub-button">
+      戻る
+    </button>
+
+  </div>
+
+</div>
+```
 
 
     <!-- ==================== ゲーム終了確認 ==================== -->
