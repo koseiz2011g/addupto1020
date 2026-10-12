@@ -3593,6 +3593,82 @@ updateSoundSettingUI();
  }
 
 
+// 対戦モードの墓地を表示
+function renderBattleGraveyard() {
+  const grave = document.querySelector(
+    "#battle-test-screen .battle-grave-card"
+  );
+
+  if (!grave) return;
+
+  if (battleGame.graveyard.length === 0) {
+    grave.textContent = "－";
+    grave.className = "battle-grave-card";
+    return;
+  }
+
+  const card =
+    battleGame.graveyard[battleGame.graveyard.length - 1];
+
+  grave.textContent = `${card.value}${card.suit}`;
+  grave.className =
+    `battle-grave-card ${
+      card.color === "red" ? "card-red" : "card-black"
+    }`;
+}
+
+
+
+// 対戦モードの墓地一覧を開く
+function openBattleGraveyard() {
+  const overlay = document.getElementById(
+    "battle-graveyard-overlay"
+  );
+
+  const history = document.getElementById(
+    "battle-graveyard-history"
+  );
+
+  if (!overlay || !history) return;
+
+  history.replaceChildren();
+
+  if (battleGame.graveyard.length === 0) {
+    const message = document.createElement("p");
+    message.textContent = "墓地にカードはありません";
+    history.appendChild(message);
+  } else {
+    battleGame.graveyard.forEach(card => {
+      const element = document.createElement("div");
+
+      element.className =
+        `battle-grave-history-card ${
+          card.color === "red" ? "card-red" : "card-black"
+        }`;
+
+      element.innerHTML = `
+        <div>${card.value}</div>
+        <div>${card.suit}</div>
+      `;
+
+      history.appendChild(element);
+    });
+  }
+
+  overlay.classList.remove("hidden");
+}
+
+// 対戦モードの墓地一覧を閉じる
+function closeBattleGraveyard() {
+  const overlay = document.getElementById(
+    "battle-graveyard-overlay"
+  );
+
+  if (overlay) {
+    overlay.classList.add("hidden");
+  }
+}
+
  
 function toggleBattleSetSelection(fieldIndex) {
   if (!battleGame.inProgress) {
@@ -4082,6 +4158,7 @@ function renderBattle() {
   renderBattleField();
   renderBattleHands();
   renderBattleControls();
+  renderBattleGraveyard();
 
   const deckCount = document.querySelector(
     "#battle-test-screen .battle-deck-count"
@@ -4091,6 +4168,25 @@ function renderBattle() {
     deckCount.textContent = battleGame.deck.length;
   }
 }
+
+// 対戦モードの墓地ボタン操作
+document.addEventListener("DOMContentLoaded", () => {
+  const graveButton = document.querySelector(
+    "#battle-test-screen .battle-grave-card"
+  );
+
+  const closeButton = document.getElementById(
+    "battle-close-graveyard-button"
+  );
+
+  if (graveButton) {
+    graveButton.addEventListener("click", openBattleGraveyard);
+  }
+
+  if (closeButton) {
+    closeButton.addEventListener("click", closeBattleGraveyard);
+  }
+});
 
 
 function renderBattleControls() {
