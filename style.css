@@ -2531,3 +2531,42 @@ h1 {
   outline-offset: -3px;
   border-radius: 8px;
 }
+
+
+/* 対戦画面：ターン切り替えポップアップ */
+.battle-turn-popup {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  width: max-content;
+  max-width: 90%;
+  box-sizing: border-box;
+  padding: 18px 28px;
+
+  background: rgba(25, 55, 95, 0.96);
+  color: #fff;
+  border: 3px solid #ffe650;
+  border-radius: 16px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+
+  text-align: center;
+  font-size: clamp(22px, 4vw, 34px);
+  font-weight: 700;
+  line-height: 1.5;
+  white-space: pre-line;
+
+  z-index: 2000;
+  pointer-events: none;
+
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease;
+}
+
+.battle-turn-popup.show {
+  opacity: 1;
+  visibility: visible;
+}
+
