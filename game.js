@@ -4209,18 +4209,68 @@ function getBattleNextSum(
   return current + card.value;
 }
 
+/* =========================================================
+    2人対戦：ターン表示
+ ========================================================= */
+function updateBattleTurnDisplay() {
+  const turnDisplay = document.querySelector(
+    "#battle-test-screen .battle-turn-display"
+  );
+
+  if (!turnDisplay) return;
+
+  const playerNumber = battleGame.currentPlayer + 1;
+
+  turnDisplay.textContent =
+    `第${battleGame.turn}ターン　プレイヤー${playerNumber}の番`;
+}
+
+
+
+let battleTurnPopupTimer = null;
+
+function showBattleTurnPopup(isLastTurn = false) {
+  const popup = document.getElementById(
+    "battle-turn-popup"
+  );
+
+  if (!popup) return;
+
+  const playerNumber = battleGame.currentPlayer + 1;
+
+  popup.textContent = isLastTurn
+    ? `最終ターン\n第${battleGame.turn}ターン\nプレイヤー${playerNumber}の番`
+    : `第${battleGame.turn}ターン\nプレイヤー${playerNumber}の番`;
+
+  popup.classList.remove("show");
+
+  // 連続して呼ばれた場合、前のタイマーを解除
+  if (battleTurnPopupTimer !== null) {
+    clearTimeout(battleTurnPopupTimer);
+  }
+
+  // 再表示時にもアニメーションが働くようにする
+  void popup.offsetWidth;
+
+  popup.classList.add("show");
+
+  battleTurnPopupTimer = setTimeout(() => {
+    popup.classList.remove("show");
+    battleTurnPopupTimer = null;
+  }, 1200);
+}
+
 
  /* =========================================================
     2人対戦：画面全体
  ========================================================= */
-
- 
 
 function renderBattle() {
   renderBattleField();
   renderBattleHands();
   renderBattleControls();
   renderBattleGraveyard();
+  updateBattleTurnDisplay();
 
   const deckCount = document.querySelector(
     "#battle-test-screen .battle-deck-count"
@@ -4462,17 +4512,42 @@ async function passBattleTurn() {
 
   const playerIndex = battleGame.currentPlayer;
 
-  // パスのペナルティとして最大2枚引く
-  const drawn = drawBattleCard(playerIndex, 2);
+  // パスを選択したことを表示
+  await showMessage("パスが選択されました", 700);
 
-  if (drawn > 0) {
-    await showMessage(`${drawn}枚ドロー（パスのペナルティ）`, 1000);
+  // ペナルティを表示
+  await showMessage("ペナルティ", 700);
+
+  // 引く枚数を決める（最大2枚）
+  const drawCount = Math.min(2, battleGame.deck.length);
+
+  if (drawCount === 2) {
+    playSound("penalty");
+    await showMessage("2ドロー", 900);
+  } else if (drawCount === 1) {
+    playSound("penalty");
+    await showMessage(
+      "山札が1枚しかないので、1ドロー",
+      1000
+    );
   } else {
-    await showMessage("山札がありません", 800);
+    await showMessage(
+      "山札がないので、0ドロー",
+      1000
+    );
   }
 
+  // ポップアップ終了後にまとめてドロー
+  if (drawCount > 0) {
+    drawBattleCard(playerIndex, drawCount);
+    await wait(250);
+  }
+
+  // ターンを終了
   await endBattleTurn();
 }
+
+
 
 
 function showBattleResult(winnerIndex, reason) {
@@ -4585,15 +4660,20 @@ return;
   battleGame.hasDrawn = false;
 
   // 山札が0枚なら、今始まるターンを最終ターンにする
+  
+  // 山札が0枚なら、今始まるターンを最終ターンにする
   if (battleGame.deck.length === 0) {
     battleGame.lastTurn = true;
     renderBattle();
+    showBattleTurnPopup(true);
     await showMessage("最終ターンです", 1000);
     renderBattle();
     return;
   }
 
   renderBattle();
+  showBattleTurnPopup();
+
 }
 
 
