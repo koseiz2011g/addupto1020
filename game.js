@@ -728,6 +728,16 @@ function addBattleStackDragEvents(
 
       event.preventDefault();
 
+      document
+  .querySelectorAll(
+    "#battle-test-screen .battle-hand"
+  )
+  .forEach(hand => {
+    hand.classList.remove(
+      "battle-hand-target-valid"
+    );
+  });
+
       const rect =
         element.getBoundingClientRect();
 
@@ -803,6 +813,16 @@ highlightBattleHandDropTarget(
       dragging = false;
 
       element.classList.remove("dragging");
+
+      document
+  .querySelectorAll(
+    "#battle-test-screen .battle-hand"
+  )
+  .forEach(hand => {
+    hand.classList.remove(
+      "battle-hand-target-valid"
+    );
+  });
 
       const playerIndex =
         battleGame.currentPlayer;
@@ -906,6 +926,17 @@ highlightBattleHandDropTarget(
       dragging = false;
 
       element.classList.remove("dragging");
+
+      document
+  .querySelectorAll(
+    "#battle-test-screen .battle-hand"
+  )
+  .forEach(hand => {
+    hand.classList.remove(
+      "battle-hand-target-valid"
+    );
+  });
+
       battleGame.dragging = null;
 
       renderBattle();
