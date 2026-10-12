@@ -779,11 +779,16 @@ element.addEventListener(
 
     // 移動先のカード置き場を光らせ、矢印を表示する
     highlightBattleStackDropTargets(
-      event.clientX,
-      event.clientY,
-      fieldIndex,
-      stackIndex
-    );
+  event.clientX,
+  event.clientY,
+  fieldIndex,
+  stackIndex
+);
+
+highlightBattleHandDropTarget(
+  event.clientX,
+  event.clientY
+);
   }
 );
 
@@ -4091,6 +4096,32 @@ function highlightBattleStackDropTargets(
   slot.appendChild(arrow);
 }
 
+
+function highlightBattleHandDropTarget(x, y) {
+  const playerIndex = battleGame.currentPlayer;
+
+  const handAreas = document.querySelectorAll(
+    "#battle-test-screen .battle-hand"
+  );
+
+  const handArea = handAreas[playerIndex];
+
+  if (!handArea) return;
+
+  const rect = handArea.getBoundingClientRect();
+
+  const insideHand =
+    x >= rect.left &&
+    x <= rect.right &&
+    y >= rect.top &&
+    y <= rect.bottom;
+
+  if (insideHand) {
+    handArea.classList.add("battle-hand-target-valid");
+  } else {
+    handArea.classList.remove("battle-hand-target-valid");
+  }
+}
 
 /* =========================================================
    2人対戦：ドロップ先表示を消す
