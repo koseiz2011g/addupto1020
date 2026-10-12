@@ -2518,10 +2518,16 @@ h1 {
 }
 
 
-
 /* 横向きスマホ：操作ボタンを少し下へ移動 */
 @media (orientation: landscape) and (max-height: 500px) {
   #battle-test-screen .battle-player-controls {
     transform: translateY(8px);
   }
+}
+
+.battle-hand-target-valid {
+  background: rgba(255, 230, 80, 0.35);
+  outline: 3px solid #ffe650;
+  outline-offset: -3px;
+  border-radius: 8px;
 }
