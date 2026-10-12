@@ -1358,13 +1358,15 @@ h1 {
 ========================================================= */
 
 #battle-test-screen {
-  --battle-card-height: min(15vh, 86px);
+  --battle-card-height: min(15dvh, 86px);
   --battle-card-width: calc(var(--battle-card-height) * 0.75);
 
   position: relative;
 
   width: 100%;
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
 
   box-sizing: border-box;
 
@@ -1380,7 +1382,7 @@ h1 {
 
 .battle-horizontal-layout {
   width: 100%;
-  height: calc(100vh - 16px);
+  height: calc(100% - 16px);
   min-height: 0;
   display: flex;
   flex-direction: column;
@@ -1552,6 +1554,102 @@ h1 {
   margin-top: 3px;
 }
 
+/* 対戦モードの墓地ボタン */
+#battle-test-screen .battle-grave-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+}
+
+
+/* 墓地のカード一覧 */
+#battle-graveyard-history {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 10px;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+
+
+/* 対戦モードの墓地：一番上のカード */
+#battle-test-screen .battle-grave-card {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--battle-card-width);
+  min-height: var(--battle-card-height);
+  padding: 4px;
+  font-size: calc(var(--battle-card-width) * 0.32);
+  background: white;
+  border: 1px solid #888;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* 対戦モードの墓地履歴 */
+#battle-graveyard-history .battle-grave-history-card {
+  box-sizing: border-box;
+  width: var(--battle-card-width);
+  min-height: var(--battle-card-height);
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 6px;
+  background: white;
+  border: 1px solid #aaa;
+  border-radius: 6px;
+  font-size: calc(var(--battle-card-width) * 0.3);
+}
+
+/* 対戦モード：墓地確認ウィンドウ */
+#battle-graveyard-overlay .overlay-panel {
+  display: flex;
+  flex-direction: column;
+  max-height: 85vh;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* 墓地の見出しを少し小さくして固定 */
+#battle-graveyard-overlay .overlay-panel h2 {
+  flex: 0 0 auto;
+  font-size: 1.2em;
+  margin: 0 0 10px;
+  text-align: center;
+}
+
+/* カード一覧だけをスクロール */
+#battle-graveyard-history {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* 戻るボタンを下部に固定 */
+#battle-graveyard-overlay #battle-close-graveyard-button {
+  flex: 0 0 auto;
+  margin-top: 10px;
+}
+
+/* 対戦モード：墓地の戻るボタンを中央寄せ */
+#battle-graveyard-overlay #battle-close-graveyard-button {
+  display: block;
+  margin: 10px auto 0;
+}
 
 /* =========================================================
    場札4枚
@@ -2418,4 +2516,5 @@ h1 {
   background: #2875c7;
   color: #ffffff;
 }
+
 
