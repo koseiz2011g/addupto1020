@@ -1382,7 +1382,7 @@ h1 {
 
 .battle-horizontal-layout {
   width: 100%;
-  height: calc(100% - 16px);
+  height: calc(100% - 8px);
   min-height: 0;
   display: flex;
   flex-direction: column;
