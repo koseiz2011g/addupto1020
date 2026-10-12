@@ -2518,3 +2518,10 @@ h1 {
 }
 
 
+
+/* 横向きスマホ：操作ボタンを少し下へ移動 */
+@media (orientation: landscape) and (max-height: 500px) {
+  #battle-test-screen .battle-player-controls {
+    transform: translateY(8px);
+  }
+}
