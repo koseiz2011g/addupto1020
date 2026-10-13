@@ -3777,17 +3777,19 @@ function toggleBattleSetSelection(fieldIndex) {
    battleField.innerHTML = "";
 
    battleGame.field.forEach(
-     (field, fieldIndex) => {
+  (field, fieldIndex) => {
 
-       if (!field) {
-         return;
-       }
+    const slot =
+      document.createElement("div");
 
-       const slot =
-         document.createElement("div");
+    slot.className = "battle-field-slot";
 
-       slot.className =
-         "battle-field-slot";
+    // 場札が空でも、位置を確保する
+    if (!field) {
+      slot.classList.add("battle-field-slot-empty");
+      battleField.appendChild(slot);
+      return;
+    }
 
        if (battleGame.selectedSets.includes(fieldIndex)) {
          slot.classList.add("battle-set-selected");
