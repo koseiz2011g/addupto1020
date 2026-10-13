@@ -197,33 +197,39 @@
 
 <!-- ==================== 2人で対戦メニュー ==================== -->
 <section id="versus-menu-screen" class="screen">
-  <h2>2人で対戦</h2>
 
-  <div class="versus-menu-players">
+  <div class="versus-menu-layout">
+
+    <!-- 左：プレイヤー1 -->
     <div class="versus-menu-player player1">
-      <div class="versus-menu-icon">🧑</div>
       <h3>プレイヤー1</h3>
-    </div>
-
-    <div class="versus-menu-vs">VS</div>
-
-    <div class="versus-menu-player player2">
       <div class="versus-menu-icon">🧑</div>
-      <h3>プレイヤー2</h3>
     </div>
+
+    <!-- 中央：タイトル・説明・ボタン -->
+    <div class="versus-menu-center">
+      <h2>2人で対戦</h2>
+
+      <p class="versus-menu-description">
+        交互にカードを出して、先に手札をなくそう！
+      </p>
+
+      <button id="battle-start-button" class="main-button">
+        ゲームスタート
+      </button>
+
+      <button id="versus-menu-back-button" class="sub-button">
+        メニューへ戻る
+      </button>
+    </div>
+
+    <!-- 右：プレイヤー2 -->
+    <div class="versus-menu-player player2">
+      <h3>プレイヤー2</h3>
+      <div class="versus-menu-icon">🧑</div>
+    </div>
+
   </div>
-
-  <p class="versus-menu-description">
-    交互にカードを出して、先に手札をなくそう！
-  </p>
-
-  <button id="battle-start-button" class="main-button">
-    ゲームスタート
-  </button>
-
-  <button id="versus-menu-back-button" class="sub-button">
-    メニューへ戻る
-  </button>
 </section>
 
 
@@ -419,39 +425,63 @@
 
 <!-- 対戦結果画面 -->
 <section id="battle-result-screen" class="screen">
-  <div class="battle-result-content">
-    <header class="battle-result-header">
-      <h2>対戦結果</h2>
-      <p>ターン数 <span id="battle-result-turn">0</span></p>
-    </header>
 
-    <div class="battle-result-players">
-      <div class="battle-result-player" id="battle-result-player1">
-        <h3>プレイヤー1</h3>
-        <p>残り手札 <span id="battle-result-hand1">0</span>枚</p>
-        <div class="battle-result-outcome" id="battle-result-outcome1">勝利！</div>
+  <div class="battle-result-layout">
+
+    <!-- 左：プレイヤー1 -->
+    <div class="battle-result-illustration player1">
+      <h3>プレイヤー1</h3>
+      <div class="battle-result-icon">🧑</div>
+    </div>
+
+    <!-- 中央：対戦結果 -->
+    <div class="battle-result-center">
+      <div class="battle-result-content">
+
+        <header class="battle-result-header">
+          <h2>対戦結果</h2>
+          <p>ターン数 <span id="battle-result-turn">0</span></p>
+        </header>
+
+        <div class="battle-result-players">
+
+          <div class="battle-result-player" id="battle-result-player1">
+            <h3>プレイヤー1</h3>
+            <p>残り手札 <span id="battle-result-hand1">0</span>枚</p>
+            <div class="battle-result-outcome" id="battle-result-outcome1">勝利！</div>
+          </div>
+
+          <div class="battle-result-player" id="battle-result-player2">
+            <h3>プレイヤー2</h3>
+            <p>残り手札 <span id="battle-result-hand2">0</span>枚</p>
+            <div class="battle-result-outcome" id="battle-result-outcome2">敗北…</div>
+          </div>
+
+        </div>
+
+        <div class="battle-result-reason">
+          <h3>勝敗の決まり方</h3>
+          <p id="battle-result-reason-text"></p>
+        </div>
+
       </div>
 
-      <div class="battle-result-player" id="battle-result-player2">
-        <h3>プレイヤー2</h3>
-        <p>残り手札 <span id="battle-result-hand2">0</span>枚</p>
-        <div class="battle-result-outcome" id="battle-result-outcome2">敗北…</div>
+      <div class="battle-result-bottom-buttons">
+        <button id="battle-result-menu" class="battle-result-button">
+          メニューへ
+        </button>
+        <button id="battle-result-replay" class="battle-result-button">
+          もう一度対戦
+        </button>
       </div>
     </div>
 
-    <div class="battle-result-reason">
-      <h3>勝敗の決まり方</h3>
-      <p id="battle-result-reason-text"></p>
+    <!-- 右：プレイヤー2 -->
+    <div class="battle-result-illustration player2">
+      <h3>プレイヤー2</h3>
+      <div class="battle-result-icon">🧑</div>
     </div>
-  </div>
 
-  <div class="battle-result-bottom-buttons">
-    <button id="battle-result-menu" class="battle-result-button">
-      メニューへ
-    </button>
-    <button id="battle-result-replay" class="battle-result-button">
-      もう一度対戦
-    </button>
   </div>
 </section>
 
