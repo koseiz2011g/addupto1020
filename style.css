@@ -2575,4 +2575,431 @@ h1 {
   pointer-events: none;
 }
 
+/* 2人で対戦メニュー：左右にプレイヤー、中央に操作 */
+#versus-menu-screen {
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  box-sizing: border-box;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+#versus-menu-screen.hidden {
+  display: none;
+}
+
+#versus-menu-screen .versus-menu-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 1.2fr) minmax(0, 1fr);
+  align-items: stretch;
+  gap: clamp(12px, 3vw, 36px);
+  width: 100%;
+  max-width: 1100px;
+  margin: auto;
+}
+
+/* 左右のプレイヤー欄 */
+#versus-menu-screen .versus-menu-player {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 240px;
+  padding: 12px;
+  box-sizing: border-box;
+  border: 2px solid #d5dce5;
+  border-radius: 16px;
+  background: #fff;
+}
+
+#versus-menu-screen .versus-menu-player.player1 {
+  border-color: #2868b2;
+}
+
+#versus-menu-screen .versus-menu-player.player2 {
+  border-color: #b54747;
+}
+
+#versus-menu-screen .versus-menu-player h3 {
+  margin: 0 0 12px;
+  font-size: clamp(16px, 2vw, 23px);
+  white-space: nowrap;
+}
+
+/* イラストスペースを広く確保 */
+#versus-menu-screen .versus-menu-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  width: 100%;
+  min-height: clamp(140px, 30vh, 300px);
+  font-size: clamp(64px, 10vw, 120px);
+}
+
+/* 中央のタイトルと操作 */
+#versus-menu-screen .versus-menu-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  gap: 16px;
+}
+
+#versus-menu-screen .versus-menu-center h2 {
+  margin: 0;
+  font-size: clamp(26px, 3vw, 38px);
+}
+
+#versus-menu-screen .versus-menu-description {
+  margin: 0 0 8px;
+  font-size: clamp(14px, 1.8vw, 19px);
+  line-height: 1.6;
+}
+
+#versus-menu-screen #battle-start-button,
+#versus-menu-screen #versus-menu-back-button {
+  display: block;
+  width: 100%;
+  max-width: 320px;
+  box-sizing: border-box;
+  margin: 0 auto;
+}
+
+#versus-menu-screen #battle-start-button {
+  min-height: 54px;
+}
+
+#versus-menu-screen #versus-menu-back-button {
+  min-height: 46px;
+}
+
+/* 画面の高さが小さい場合 */
+@media (max-height: 600px) and (orientation: landscape) {
+  #versus-menu-screen {
+    padding: 6px 16px;
+  }
+
+  #versus-menu-screen .versus-menu-layout {
+    gap: 12px;
+  }
+
+  #versus-menu-screen .versus-menu-player {
+    min-height: 0;
+    padding: 6px;
+  }
+
+  #versus-menu-screen .versus-menu-player h3 {
+    margin-bottom: 4px;
+  }
+
+  #versus-menu-screen .versus-menu-icon {
+    min-height: 90px;
+    font-size: clamp(48px, 8vw, 80px);
+  }
+
+  #versus-menu-screen .versus-menu-center {
+    gap: 8px;
+  }
+
+  #versus-menu-screen .versus-menu-description {
+    margin-bottom: 0;
+  }
+
+  #versus-menu-screen #battle-start-button {
+    min-height: 44px;
+  }
+
+  #versus-menu-screen #versus-menu-back-button {
+    min-height: 40px;
+  }
+}
+
+/* スマートフォン縦画面では縦配置に切り替える */
+@media (max-width: 600px) and (orientation: portrait) {
+  #versus-menu-screen {
+    padding: 20px 12px;
+    align-items: flex-start;
+  }
+
+  #versus-menu-screen .versus-menu-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  #versus-menu-screen .versus-menu-center {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    gap: 12px;
+  }
+
+  #versus-menu-screen .versus-menu-player {
+    min-height: 120px;
+    padding: 8px 4px;
+  }
+
+  #versus-menu-screen .versus-menu-player h3 {
+    font-size: 15px;
+  }
+
+  #versus-menu-screen .versus-menu-icon {
+    min-height: 72px;
+    font-size: 54px;
+  }
+}
+
+/* 対戦結果画面：左右にイラスト、中央に結果 */
+#battle-result-screen {
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  box-sizing: border-box;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#battle-result-screen.hidden {
+  display: none;
+}
+
+#battle-result-screen .battle-result-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 1.4fr) minmax(0, 1fr);
+  align-items: stretch;
+  gap: clamp(12px, 3vw, 36px);
+  width: 100%;
+  max-width: 1100px;
+  margin: auto;
+}
+
+/* 左右のイラストスペース */
+#battle-result-screen .battle-result-illustration {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 240px;
+  padding: 12px;
+  box-sizing: border-box;
+  border: 2px solid #d5dce5;
+  border-radius: 16px;
+  background: #fff;
+}
+
+#battle-result-screen .battle-result-illustration.player1 {
+  border-color: #2868b2;
+}
+
+#battle-result-screen .battle-result-illustration.player2 {
+  border-color: #b54747;
+}
+
+#battle-result-screen .battle-result-illustration h3 {
+  margin: 0 0 12px;
+  font-size: clamp(16px, 2vw, 22px);
+  white-space: nowrap;
+}
+
+#battle-result-screen .battle-result-icon {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: clamp(140px, 30vh, 300px);
+  font-size: clamp(64px, 10vw, 120px);
+}
+
+/* 中央の結果とボタン */
+#battle-result-screen .battle-result-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+#battle-result-screen .battle-result-content {
+  width: 100%;
+  min-width: 0;
+}
+
+#battle-result-screen .battle-result-header {
+  text-align: center;
+}
+
+#battle-result-screen .battle-result-header h2 {
+  margin: 0 0 8px;
+  font-size: clamp(26px, 3vw, 36px);
+}
+
+#battle-result-screen .battle-result-header p {
+  margin: 0 0 12px;
+}
+
+#battle-result-screen .battle-result-players {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+#battle-result-screen .battle-result-player {
+  min-width: 0;
+  padding: 10px 6px;
+  box-sizing: border-box;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+#battle-result-screen .battle-result-player h3 {
+  margin: 0 0 8px;
+  font-size: clamp(15px, 1.8vw, 20px);
+}
+
+#battle-result-screen .battle-result-player p {
+  margin: 6px 0;
+  font-size: clamp(13px, 1.5vw, 16px);
+}
+
+#battle-result-screen .battle-result-outcome {
+  font-size: clamp(16px, 2vw, 22px);
+  font-weight: 800;
+}
+
+#battle-result-screen .battle-result-reason {
+  margin-top: 12px;
+  text-align: center;
+}
+
+#battle-result-screen .battle-result-reason h3 {
+  margin: 0 0 6px;
+  font-size: clamp(15px, 1.8vw, 19px);
+}
+
+#battle-result-screen .battle-result-reason p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+#battle-result-screen .battle-result-bottom-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+#battle-result-screen .battle-result-button {
+  flex: 1;
+  width: auto;
+  max-width: 220px;
+  min-width: 0;
+  min-height: 48px;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+#battle-result-screen .battle-result-button {
+  width: 100%;
+  max-width: 320px;
+  min-height: 48px;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+/* 横向きで画面の高さが小さい場合 */
+@media (max-height: 600px) and (orientation: landscape) {
+  #battle-result-screen {
+    padding: 6px 12px;
+  }
+
+  #battle-result-screen .battle-result-layout {
+    gap: 12px;
+  }
+
+  #battle-result-screen .battle-result-illustration {
+    min-height: 0;
+    padding: 6px;
+  }
+
+  #battle-result-screen .battle-result-illustration h3 {
+    margin-bottom: 4px;
+  }
+
+  #battle-result-screen .battle-result-icon {
+    min-height: 80px;
+    font-size: clamp(48px, 8vw, 80px);
+  }
+
+  #battle-result-screen .battle-result-center {
+    gap: 8px;
+  }
+
+  #battle-result-screen .battle-result-header h2 {
+    margin-bottom: 4px;
+  }
+
+  #battle-result-screen .battle-result-header p {
+    margin-bottom: 6px;
+  }
+
+  #battle-result-screen .battle-result-reason {
+    margin-top: 6px;
+  }
+
+  #battle-result-screen .battle-result-button {
+    min-height: 38px;
+  }
+}
+
+/* スマートフォン縦画面 */
+@media (max-width: 600px) and (orientation: portrait) {
+  #battle-result-screen {
+    padding: 16px 10px;
+  }
+
+  #battle-result-screen .battle-result-layout {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  #battle-result-screen .battle-result-center {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    gap: 12px;
+  }
+
+  #battle-result-screen .battle-result-illustration {
+    min-height: 110px;
+    padding: 6px 4px;
+  }
+
+  #battle-result-screen .battle-result-illustration h3 {
+    margin-bottom: 4px;
+    font-size: 14px;
+  }
+
+  #battle-result-screen .battle-result-icon {
+    min-height: 64px;
+    font-size: 52px;
+  }
+
+  #battle-result-screen .battle-result-button {
+    min-height: 44px;
+  }
+}
+
+
+
 
