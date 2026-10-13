@@ -2570,3 +2570,9 @@ h1 {
   visibility: visible;
 }
 
+#battle-test-screen .battle-field-slot-empty {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+
