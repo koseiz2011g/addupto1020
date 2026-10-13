@@ -441,6 +441,8 @@ const battleGame = {
 
   hasDrawn: false,
 
+  isPassing: false,
+
   /*
    * 最初のプレイヤーが
    * 初回ターンで手札0枚になった場合
@@ -949,39 +951,47 @@ highlightBattleHandDropTarget(
    2人対戦：場札の位置判定
 ========================================================= */
 
-function getBattleFieldAtPoint(x, y) {
 
-  const fieldArea =
-    document.querySelector(
-      "#battle-test-screen .battle-field"
-    );
+function getBattleFieldAtPoint(x, y) {
+  const fieldArea = document.querySelector(
+    "#battle-test-screen .battle-field"
+  );
 
   if (!fieldArea) {
     return -1;
   }
 
-  const slots =
-    fieldArea.querySelectorAll(
-      ".battle-field-slot"
-    );
+  const slots = Array.from(
+    fieldArea.querySelectorAll(".battle-field-slot")
+  );
 
+  // 指の位置にある場札を探す
+  // 複数の判定範囲が重なった場合は、
+  // 実際に指が入っているスロット本体を優先する
   for (let i = 0; i < slots.length; i++) {
-
-    const rect =
-      slots[i].getBoundingClientRect();
-
-    /*
-     * 場札本体＋重なったカード部分を
-     * ドロップ可能範囲にする
-     */
-    const bottom =
-      rect.bottom +
-      getBattleCardHeight() * 3;
+    const rect = slots[i].getBoundingClientRect();
 
     if (
       x >= rect.left &&
       x <= rect.right &&
       y >= rect.top &&
+      y <= rect.bottom
+    ) {
+      return i;
+    }
+  }
+
+  // スロット本体に入っていない場合は、
+  // 重なったカード部分も判定対象にする
+  for (let i = 0; i < slots.length; i++) {
+    const rect = slots[i].getBoundingClientRect();
+    const bottom =
+      rect.bottom + getBattleCardHeight() * 3;
+
+    if (
+      x >= rect.left &&
+      x <= rect.right &&
+      y > rect.bottom &&
       y <= bottom
     ) {
       return i;
@@ -990,6 +1000,7 @@ function getBattleFieldAtPoint(x, y) {
 
   return -1;
 }
+
 
 
 /* =========================================================
@@ -4508,7 +4519,11 @@ function drawBattleCard(playerIndex, count = 1) {
 
 
 async function passBattleTurn() {
-  if (!battleGame.inProgress) return;
+  if (!battleGame.inProgress || battleGame.isPassing) return;
+
+  battleGame.isPassing = true;
+
+  try {
 
   const playerIndex = battleGame.currentPlayer;
 
@@ -4544,7 +4559,10 @@ async function passBattleTurn() {
   }
 
   // ターンを終了
-  await endBattleTurn();
+   await endBattleTurn();
+  } finally {
+    battleGame.isPassing = false;
+  }
 }
 
 
