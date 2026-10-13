@@ -443,6 +443,8 @@ const battleGame = {
 
   isPassing: false,
 
+  isConfirming: false,
+
   /*
    * 最初のプレイヤーが
    * 初回ターンで手札0枚になった場合
@@ -1575,18 +1577,22 @@ if (cardCount >= 7) {
    決定
 ========================================================= */
 
-async function confirmSets(isFinal = false) {
 
+async function confirmSets(isFinal = false) {
   if (!game.inProgress) {
+    return;
+  }
+
+  if (game.isConfirming) {
     return;
   }
 
   const validSets = getValidSets();
 
   if (validSets.length >= 3) {
-  await showSetLimitPopup();
-  return;
-}
+    await showSetLimitPopup();
+    return;
+  }
 
   if (validSets.length === 0) {
     return;
@@ -1596,116 +1602,77 @@ async function confirmSets(isFinal = false) {
     return;
   }
 
-  
+  game.isConfirming = true;
 
-  hideActionButtons();
+  try {
+    hideActionButtons();
 
-/*
- * 決定音
- */
-playSound("decide");
+    // 決定音
+    playSound("decide");
 
-/*
- * 完成したセットを順番に処理
- */
+    // 完成したセットを順番に処理
+    for (const setInfo of validSets) {
+      const field = game.field[setInfo.fieldIndex];
 
-for (const setInfo of validSets) {
+      // セット得点を計算
+      const setScore = calculateSetScore(field);
 
-  const field = game.field[setInfo.fieldIndex];
+      if (setScore.type === "suit") {
+        game.score.setSuit += setScore.points;
+      } else if (setScore.type === "color") {
+        game.score.setColor += setScore.points;
+      } else {
+        game.score.setNormal += setScore.points;
+      }
 
-  /*
-   * セット得点を計算
-   * 墓地へ送る前に計算する
-   */
-  const setScore =
-    calculateSetScore(field);
+      // 完成ポップ
+      await showMessage(`${setInfo.total}完成！`, 1000);
 
-  if (setScore.type === "suit") {
+      // 墓地へ1枚ずつ移動
+      game.graveyard.push(field.base);
 
-    game.score.setSuit +=
-      setScore.points;
+      for (const card of field.stack) {
+        game.graveyard.push(card);
 
-  } else if (setScore.type === "color") {
+        playSound("grave");
+        renderAll();
 
-    game.score.setColor +=
-      setScore.points;
+        await wait(120);
+      }
 
-  } else {
-
-    game.score.setNormal +=
-      setScore.points;
-  }
-
-  
-  /*
-   * 完成ポップ
-   */
-  await showMessage(
-    `${setInfo.total}完成！`,
-    1000
-  );
-
-  /*
-   * 墓地へ1枚ずつ移動
-   */
-    game.graveyard.push(field.base);
-
-    for (const card of field.stack) {
-
-      game.graveyard.push(card);
-
-      playSound("grave");
+      // 場札を空にする
+      game.field[setInfo.fieldIndex] = null;
 
       renderAll();
-
-      await wait(120);
+      await wait(150);
     }
 
-    /*
-     * 場札を空にする
-     */
-    game.field[setInfo.fieldIndex] = null;
+    // 手札が0枚、かつ場札に未完成のカードも残っていなければ勝利
+    const remainingFieldCards = game.field.some(
+      field => field && field.stack.length > 0
+    );
 
-    renderAll();
+    if (game.hand.length === 0 && !remainingFieldCards) {
+      winGame();
+      return;
+    }
 
-    await wait(150);
+    // 空いた場札を補充
+    await refillField();
+
+    // 最終ターンの勝敗
+    if (isFinal) {
+      loseGame();
+      return;
+    }
+
+    nextTurn();
+
+  } finally {
+    game.isConfirming = false;
   }
-
-
-  // 手札が0枚、かつ場札に未完成のカードも残っていなければ勝利
-const remainingFieldCards = game.field.some(
-  field => field && field.stack.length > 0
-);
-
-if (
-  game.hand.length === 0 &&
-  !remainingFieldCards
-) {
-  winGame();
-  return;
 }
 
-
-  /*
-   * 空いた場札を補充
-   */
-
-  await refillField();
-
-
-  /*
-   * 最終ターンの勝敗
-   */
-
-  if (isFinal) {
-
-    loseGame();
-    return;
-  }
-
-
-  nextTurn();
-}
 
 
 /* =========================================================
@@ -4347,28 +4314,25 @@ function renderBattleControls() {
 
 
  
+
 async function confirmBattleSets() {
-  if (!battleGame.inProgress) return;
+  if (!battleGame.inProgress || battleGame.isConfirming) return;
 
   const playerIndex = battleGame.currentPlayer;
   const hand = battleGame.players[playerIndex].hand;
+  const selected = [...battleGame.selectedSets];
 
-  // 選択したセットを確認
-  
-const selected = [...battleGame.selectedSets];
+  if (selected.length === 0) {
+    await showMessage(
+      "セットの一番上のカードをタップしてください",
+      1200
+    );
+    return;
+  }
 
-if (selected.length === 0) {
-  await showMessage(
-    "セットの一番上のカードをタップしてください",
-    1200
-  );
-  return;
-}
-
-if (selected.length > 2) {
-  return;
-}
-
+  if (selected.length > 2) {
+    return;
+  }
 
   const setInfos = [];
 
@@ -4385,108 +4349,113 @@ if (selected.length > 2) {
     setInfos.push({ fieldIndex, total });
   }
 
-  // 決定音
-  playSound("decide");
+  // ここから処理中ロック
+  battleGame.isConfirming = true;
 
-  // 完成したセットを順番に処理
-  for (const setInfo of setInfos) {
-    const field = battleGame.field[setInfo.fieldIndex];
-    if (!field) continue;
+  try {
+    // 決定音
+    playSound("decide");
 
-    // 完成ポップアップと効果音
-    await showMessage(`${setInfo.total}完成！`, 1000);
+    // 完成したセットを順番に処理
+    for (const setInfo of setInfos) {
+      const field = battleGame.field[setInfo.fieldIndex];
+      if (!field) continue;
 
-    // 場札と重ねたカードを墓地へ移動
-    battleGame.graveyard.push(field.base);
+      // 完成ポップアップ
+      await showMessage(`${setInfo.total}完成！`, 1000);
 
-    for (const card of field.stack) {
-      battleGame.graveyard.push(card);
-      playSound("grave");
+      // 場札と重ねたカードを墓地へ移動
+      battleGame.graveyard.push(field.base);
+
+      for (const card of field.stack) {
+        battleGame.graveyard.push(card);
+        playSound("grave");
+        renderBattle();
+        await wait(120);
+      }
+
+      // この場札を補充対象にする
+      battleGame.field[setInfo.fieldIndex] = null;
       renderBattle();
-      await wait(120);
+      await wait(150);
     }
 
-    // この場札を補充対象にする
-    battleGame.field[setInfo.fieldIndex] = null;
+    battleGame.selectedSets = [];
+
+    // 空いた場札を山札から補充
+    for (let i = 0; i < battleGame.field.length; i++) {
+      if (battleGame.field[i] !== null) continue;
+      if (battleGame.deck.length === 0) break;
+
+      const card = battleGame.deck.pop();
+
+      if (card) {
+        battleGame.field[i] = {
+          base: card,
+          stack: []
+        };
+
+        renderBattle();
+        await wait(220);
+      }
+    }
+
     renderBattle();
-    await wait(150);
-  }
 
-  battleGame.selectedSets = [];
+    // 未完成のセットに残ったカードを手札に戻す
+    battleGame.field.forEach(field => {
+      if (!field || !field.stack || field.stack.length === 0) return;
 
-  // 空いた場札を山札から補充
-  for (let i = 0; i < battleGame.field.length; i++) {
-    if (battleGame.field[i] !== null) continue;
-    if (battleGame.deck.length === 0) break;
+      hand.push(...field.stack);
+      field.stack = [];
+    });
 
-    const card = battleGame.deck.pop();
-    if (card) {
-      battleGame.field[i] = {
-        base: card,
-        stack: []
-      };
-      renderBattle();
-      await wait(220);
+    battleGame.selectedSets = [];
+    renderBattle();
+
+    // 未完成カードを戻した後で勝利判定
+    if (hand.length === 0) {
+      // プレイヤー1が最初のターンで上がった場合
+      if (
+        playerIndex === 0 &&
+        battleGame.turn === 1 &&
+        !battleGame.firstPlayerCleared
+      ) {
+        battleGame.firstPlayerCleared = true;
+
+        await showMessage(
+          "プレイヤー1が上がりました！プレイヤー2の挑戦です",
+          1500
+        );
+
+        await endBattleTurn();
+        return;
+      }
+
+      // 両プレイヤーが最初のターンで上がった場合
+      if (battleGame.firstPlayerCleared && playerIndex === 1) {
+        showBattleResult(
+          null,
+          "両プレイヤーが最初のターンで上がったから"
+        );
+        return;
+      }
+
+      // 通常の勝利
+      showBattleResult(
+        playerIndex,
+        "先に手札をなくしたから"
+      );
+      return;
     }
-  }
-
-  
-  renderBattle();
-
-  
-  // 未完成のセットに残ったカードを手札に戻す
-  battleGame.field.forEach(field => {
-    if (!field || !field.stack || field.stack.length === 0) return;
-
-    hand.push(...field.stack);
-    field.stack = [];
-  });
-
-  battleGame.selectedSets = [];
-  renderBattle();
-
-  // 未完成カードを戻した後で勝利判定
-  
-if (hand.length === 0) {
-  // プレイヤー1が最初のターンで上がった場合
-  if (
-    playerIndex === 0 &&
-    battleGame.turn === 1 &&
-    !battleGame.firstPlayerCleared
-  ) {
-    battleGame.firstPlayerCleared = true;
-
-    await showMessage(
-      "プレイヤー1が上がりました！プレイヤー2の挑戦です",
-      1500
-    );
 
     await endBattleTurn();
-    return;
-  }
 
-  // プレイヤー1が最初のターンで上がり、
-  // プレイヤー2も次のターンで上がった場合
-  if (battleGame.firstPlayerCleared && playerIndex === 1) {
-    showBattleResult(
-  null,
-  "両プレイヤーが最初のターンで上がったから"
-);
-return;
+  } finally {
+    battleGame.isConfirming = false;
   }
-
-  // 通常の勝利
-  showBattleResult(
-  playerIndex,
-  "先に手札をなくしたから"
-);
-return;
 }
 
-await endBattleTurn();
-
-
-}
 
 
 
