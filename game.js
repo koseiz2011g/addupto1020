@@ -14,6 +14,7 @@
 const screens = {
   menu: document.getElementById("menu-screen"),
   soloMenu: document.getElementById("solo-menu-screen"),
+    competitionMenu: document.getElementById("competition-menu-screen"),
   game: document.getElementById("game-screen"),
   result: document.getElementById("result-screen"),
   howto: document.getElementById("howto-screen"),
@@ -73,6 +74,200 @@ document.getElementById("solo-button")
     updateDailyDisplay();
   });
 
+/* =========================================================
+   みんなで競争：メニュー画面を開く
+========================================================= */
+
+document
+  .getElementById("competition-button")
+  ?.addEventListener("click", () => {
+    const createdArea =
+      document.getElementById("competition-created-area");
+
+    const enterArea =
+      document.getElementById("competition-enter-area");
+
+    const status =
+      document.getElementById("competition-status");
+
+    if (createdArea) createdArea.hidden = true;
+    if (enterArea) enterArea.hidden = true;
+    if (status) status.textContent = "";
+
+    showScreen("competitionMenu");
+  });
+
+
+
+/* =========================================================
+   みんなで競争：メインメニューへ戻る
+========================================================= */
+
+document
+  .getElementById("competition-menu-back-button")
+  ?.addEventListener("click", () => {
+    competitionMode = false;
+    competitionCode = "";
+
+    if (competitionStartButton) {
+      competitionStartButton.hidden = true;
+    }
+
+    if (competitionCreatedArea) {
+      competitionCreatedArea.hidden = true;
+    }
+
+    if (competitionEnterArea) {
+      competitionEnterArea.hidden = true;
+    }
+
+    if (competitionStatus) {
+      competitionStatus.textContent = "";
+    }
+
+    showScreen("menu");
+  });
+
+  
+/* =========================================================
+   みんなで競争：コード作成・入力
+========================================================= */
+
+const competitionCreateButton =
+  document.getElementById("competition-create-button");
+
+const competitionEnterButton =
+  document.getElementById("competition-enter-button");
+
+const competitionCreatedArea =
+  document.getElementById("competition-created-area");
+
+const competitionCreatedCode =
+  document.getElementById("competition-created-code");
+
+const competitionCopyButton =
+  document.getElementById("competition-copy-button");
+
+const competitionEnterArea =
+  document.getElementById("competition-enter-area");
+
+const competitionCodeInput =
+  document.getElementById("competition-code-input");
+
+const competitionCheckButton =
+  document.getElementById("competition-check-button");
+
+const competitionStatus =
+  document.getElementById("competition-status");
+
+const competitionStartButton =
+  document.getElementById("competition-start-button");
+
+/* =========================================================
+   みんなで競争：ゲーム開始
+========================================================= */
+
+competitionStartButton?.addEventListener("click", async () => {
+
+  if (!competitionCode) {
+    competitionStatus.textContent =
+      "先にコードを作成するか、入力してください。";
+    return;
+  }
+
+  competitionMode = true;
+
+  await startNewGame();
+});
+
+/* 6文字のコードを作成 */
+competitionCreateButton?.addEventListener("click", () => {
+  const characters = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let code = "";
+
+  for (let i = 0; i < 6; i++) {
+    code += characters[
+      Math.floor(Math.random() * characters.length)
+    ];
+  }
+
+  competitionCode = code;
+  competitionMode = true;
+  competitionStartButton.hidden = false;
+
+  competitionCreatedCode.textContent = code;
+  competitionCreatedArea.hidden = false;
+  competitionEnterArea.hidden = true;
+  competitionStatus.textContent =
+    `コード「${code}」を設定しました。`;
+});
+
+
+/* コード入力欄を表示 */
+competitionEnterButton?.addEventListener("click", () => {
+  competitionEnterArea.hidden = false;
+  competitionCreatedArea.hidden = true;
+  competitionStatus.textContent = "";
+  competitionCodeInput.value = "";
+  competitionCodeInput.focus();
+});
+
+
+/* 作成したコードをコピー */
+competitionCopyButton?.addEventListener("click", async () => {
+  const code = competitionCreatedCode.textContent;
+
+  try {
+    await navigator.clipboard.writeText(code);
+    competitionStatus.textContent =
+      "コードをコピーしました。";
+  } catch (error) {
+    competitionStatus.textContent =
+      "コピーできませんでした。コードを選択してコピーしてください。";
+  }
+});
+
+
+/* 入力されたコードを確認 */
+competitionCheckButton?.addEventListener("click", () => {
+  const code =
+    competitionCodeInput.value.trim().toUpperCase();
+
+  competitionCodeInput.value = code;
+
+  if (!/^[A-HJ-NP-Z2-9]{6}$/.test(code)) {
+    competitionStatus.textContent =
+      "6文字のコードを正しく入力してください。";
+    return;
+  }
+
+  competitionCode = code;
+  competitionMode = true;
+  competitionStartButton.hidden = false;
+
+  competitionStatus.textContent =
+    `コード「${code}」を設定しました。`;
+});
+
+
+/* =========================================================
+   みんなで競争：確認したコードを保持
+========================================================= */
+
+competitionCheckButton?.addEventListener("click", () => {
+  const code =
+    competitionCodeInput.value.trim().toUpperCase();
+
+  if (!/^[A-HJ-NP-Z2-9]{6}$/.test(code)) {
+    return;
+  }
+
+  competitionCode = code;
+  competitionMode = true;
+
+  competitionStatus.textContent =
+    `コード「${code}」を設定しました。`;
+});
 
 document.getElementById("versus-button")
   .addEventListener("click", () => {
@@ -125,6 +320,14 @@ document.getElementById("battle-result-menu")
     showScreen("menu");
   });
 
+/* 対戦結果画面：対戦メニューへ */
+document
+  .getElementById("battle-result-versus-menu")
+  ?.addEventListener("click", () => {
+    showScreen("versusMenu");
+    renderBattleStats();
+  });
+
 /* 対戦結果画面：もう一度対戦 */
 document.getElementById("battle-result-replay")
   .addEventListener("click", () => {
@@ -133,12 +336,15 @@ document.getElementById("battle-result-replay")
   });
 
 
+
 document.getElementById("records-button")
   .addEventListener("click", () => {
     showBestScores();
     showScreen("records");
     updateRecordsDisplay();
+    updateCompetitionRecordsDisplay();
   });
+
 
 document.getElementById("howto-button")
   .addEventListener("click", () => {
@@ -176,11 +382,24 @@ document.getElementById("start-game-button")
 document.getElementById("retry-button")
   .addEventListener("click", startNewGame);
 
+
 document.getElementById("result-menu-button")
   .addEventListener("click", () => {
     updateMenuTodaySummary();
+
+    // 競争モードで結果画面から戻る場合は解除
+    if (competitionMode) {
+      competitionMode = false;
+      competitionCode = "";
+
+      if (competitionStartButton) {
+        competitionStartButton.hidden = true;
+      }
+    }
+
     showScreen("menu");
   });
+
 
 document.getElementById("game-menu-button")
   .addEventListener("click", () => {
@@ -1094,19 +1313,156 @@ function updateMenuTodaySummary() {
 }
 
 
+
 function updateRecordsDisplay() {
-
-  const record = getDailyRecord();
-
-  document.getElementById("records-challenge").textContent =
-    record.challenges;
-
-  document.getElementById("records-wins").textContent =
-    record.wins;
-
-  document.getElementById("records-losses").textContent =
-    record.losses;
+  // 本日の成績はトップ画面などに表示するため、
+  // 成績・記録画面では更新しない
 }
+
+
+
+
+/* =========================================================
+   みんなで競争：記録一覧を表示
+========================================================= */
+
+function updateCompetitionRecordsDisplay() {
+  const list = document.getElementById("competition-records-list");
+  const filter = document.getElementById(
+    "competition-records-code-filter"
+  );
+
+  if (!list) return;
+
+  let results = [];
+
+  try {
+    const saved = localStorage.getItem(
+      "tashite10or20_competition_results"
+    );
+
+    results = saved ? JSON.parse(saved) : [];
+
+    if (!Array.isArray(results)) {
+      results = [];
+    }
+  } catch (error) {
+    console.error("競争記録を読み込めませんでした。", error);
+    results = [];
+  }
+
+  // 保存済み記録からコード一覧を作成
+  const codes = [...new Set(
+    results
+      .map(result => result.code)
+      .filter(code => typeof code === "string" && code)
+  )];
+
+  // 選択中のコードを保持
+  const selectedCode = filter ? filter.value : "";
+
+  if (filter) {
+    filter.replaceChildren();
+
+    const allOption = document.createElement("option");
+    allOption.value = "";
+    allOption.textContent = "すべてのコード";
+    filter.appendChild(allOption);
+
+    codes.forEach(code => {
+      const option = document.createElement("option");
+      option.value = code;
+      option.textContent = code;
+      filter.appendChild(option);
+    });
+
+    filter.value = codes.includes(selectedCode) ? selectedCode : "";
+  }
+
+  // 選択したコードで絞り込む
+  const activeCode = filter ? filter.value : "";
+
+  if (activeCode) {
+    results = results.filter(result => result.code === activeCode);
+  }
+
+  // スコアの高い順。同点なら新しい記録を先にする
+  results = results
+    .map((result, index) => ({ ...result, _originalIndex: index }))
+    .sort((a, b) => {
+      const scoreDifference =
+        (Number(b.score) || 0) - (Number(a.score) || 0);
+
+      return scoreDifference !== 0
+        ? scoreDifference
+        : b._originalIndex - a._originalIndex;
+    });
+
+  if (results.length === 0) {
+    list.textContent = activeCode
+      ? "このコードの記録はありません。"
+      : "まだ競争記録がありません。";
+    return;
+  }
+
+  list.replaceChildren();
+
+  
+results.forEach((result, index) => {
+  const item = document.createElement("div");
+  item.className = "competition-record-item";
+
+  const heading = document.createElement("h4");
+  heading.textContent =
+    `${index + 1}. ${result.name || "名前未設定"}`;
+
+  const details = document.createElement("p");
+  details.textContent =
+    `コード：${result.code || "不明"} ／ ` +
+    `スコア：${Number(result.score) || 0}点`;
+
+  const date = document.createElement("p");
+  date.textContent =
+    `ターン数：${Number(result.turn) || 0} ／ ` +
+    `日時：${result.dateTime || "不明"}`;
+
+  const copyButton = document.createElement("button");
+  copyButton.type = "button";
+  copyButton.textContent = "結果をコピー";
+
+  const copyStatus = document.createElement("p");
+  copyStatus.setAttribute("aria-live", "polite");
+
+  copyButton.addEventListener("click", async () => {
+    const shareText = [
+      "【たして10か20・競争結果】",
+      `プレイヤー：${result.name || "名前未設定"}`,
+      `コード：${result.code || "不明"}`,
+      `スコア：${Number(result.score) || 0}点`,
+      `ターン数：${Number(result.turn) || 0}`,
+      `日時：${result.dateTime || "不明"}`
+    ].join("\n");
+
+    try {
+      await navigator.clipboard.writeText(shareText);
+      copyStatus.textContent = "コピーしました。LINEなどに貼り付けできます。";
+    } catch (error) {
+      copyStatus.textContent =
+        "コピーできませんでした。HTTPS接続で開いているか確認してください。";
+    }
+  });
+
+  item.append(heading, details, date, copyButton, copyStatus);
+  list.appendChild(item);
+});
+
+}
+
+// コードを変更したら一覧を更新
+document
+  .getElementById("competition-records-code-filter")
+  ?.addEventListener("change", updateCompetitionRecordsDisplay);
+
 
 
 /* =========================================================
@@ -1182,18 +1538,78 @@ function shuffle(array) {
 
 
 /* =========================================================
-   新しいゲーム
+   みんなで競争専用：コードから乱数を生成
 ========================================================= */
 
+function createCompetitionRandom(code) {
+
+  let seed = 0;
+
+  for (let i = 0; i < code.length; i++) {
+    seed = (Math.imul(seed, 31) + code.charCodeAt(i)) >>> 0;
+  }
+
+  if (seed === 0) {
+    seed = 1;
+  }
+
+  return function () {
+    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+    return seed / 4294967296;
+  };
+}
+
+
+/* =========================================================
+   みんなで競争専用：同じコードで同じ順番にシャッフル
+========================================================= */
+
+function shuffleCompetitionDeck(array, code) {
+
+  const random = createCompetitionRandom(code);
+
+  for (let i = array.length - 1; i > 0; i--) {
+
+    const j = Math.floor(random() * (i + 1));
+
+    [array[i], array[j]] =
+      [array[j], array[i]];
+  }
+
+  return array;
+}
+
+/* =========================================================
+   みんなで競争：現在のプレイ情報
+========================================================= */
+
+let competitionMode = false;
+let competitionCode = "";
+
+
+/* =========================================================
+   新しいゲーム
+========================================================= */
 async function startNewGame() {
 
-  const record = getDailyRecord();
+  // 通常プレイの場合だけ、挑戦回数を記録
+  if (!competitionMode) {
+    const record = getDailyRecord();
 
-  record.challenges++;
+    record.challenges++;
 
-  saveDailyRecord(record);
+    saveDailyRecord(record);
+  }
 
-  game.deck = shuffle(createDeck());
+  // 競争モードと通常プレイでシャッフルを分ける
+  if (competitionMode) {
+    game.deck = shuffleCompetitionDeck(
+      createDeck(),
+      competitionCode
+    );
+  } else {
+    game.deck = shuffle(createDeck());
+  }
 
   playSound("shuffle");
 
@@ -1937,6 +2353,12 @@ async function winGame() {
     return;
   }
 
+    // 競争モードは専用の結果処理へ
+  if (competitionMode) {
+    await finishCompetitionGame(true);
+    return;
+  }
+
   game.inProgress = false;
 
     // スコア計算
@@ -2047,6 +2469,12 @@ async function loseGame() {
     return;
   }
 
+    // 競争モードは専用の結果処理へ
+  if (competitionMode) {
+    await finishCompetitionGame(false);
+    return;
+  }
+
   game.inProgress = false;
 
   const record = getDailyRecord();
@@ -2088,6 +2516,85 @@ async function loseGame() {
   showScreen("result");
 }
 
+
+/* =========================================================
+   みんなで競争：結果処理
+========================================================= */
+
+async function finishCompetitionGame(won) {
+
+  if (!game.inProgress) {
+    return;
+  }
+
+  game.inProgress = false;
+
+  if (won) {
+    calculateFinalScore();
+    await showWinPopup();
+  } else {
+    await showLosePopup();
+
+    // 敗北時は全項目0点
+    game.score.clear = 0;
+    game.score.setNormal = 0;
+    game.score.setColor = 0;
+    game.score.setSuit = 0;
+    game.score.speed = 0;
+    game.score.oneShot = 0;
+    game.score.lastShot = 0;
+    game.score.deckRemaining = 0;
+    game.score.total = 0;
+  }
+
+  const now = new Date();
+
+  const result = {
+    name: loadPlayerName() || "名前未設定",
+    code: competitionCode,
+    score: game.score.total,
+    turn: game.turn,
+    dateTime: now.toLocaleString("ja-JP")
+  };
+
+  let results = [];
+
+  try {
+    results = JSON.parse(
+      localStorage.getItem("tashite10or20_competition_results") || "[]"
+    );
+
+    if (!Array.isArray(results)) {
+      results = [];
+    }
+  } catch (error) {
+    results = [];
+  }
+
+  results.push(result);
+
+  try {
+    localStorage.setItem(
+      "tashite10or20_competition_results",
+      JSON.stringify(results)
+    );
+  } catch (error) {
+    console.error("競争結果を保存できませんでした。", error);
+  }
+
+  document.getElementById("result-title").textContent =
+    won ? "You Win!" : "You Lose!";
+
+  document.getElementById("result-message").textContent =
+    won ? "競争完了！" : "次の挑戦でがんばりましょう！";
+
+  document.getElementById("result-turns").textContent =
+    `コード：${competitionCode} ／ 第${game.turn}ターン`;
+
+  game.isNewBest = false;
+  showFinalScore();
+  showScreen("result");
+}
 
 /* =========================================================
    ターン表示
@@ -3502,6 +4009,78 @@ function clearDropTargets(
 }
 
 /* =========================================================
+   プレイヤー名設定
+========================================================= */
+
+const PLAYER_NAME_KEY = "tashite10_player_name";
+
+const playerNameInput =
+  document.getElementById("player-name-input");
+
+const savePlayerNameButton =
+  document.getElementById("save-player-name-button");
+
+const playerNameStatus =
+  document.getElementById("player-name-status");
+
+
+/* 保存済みの名前を読み込む */
+function loadPlayerName() {
+  try {
+    return localStorage.getItem(PLAYER_NAME_KEY) || "";
+  } catch (error) {
+    console.error("プレイヤー名を読み込めませんでした。", error);
+    return "";
+  }
+}
+
+
+/* プレイヤー名を保存する */
+function savePlayerName() {
+  if (!playerNameInput) return;
+
+  const name = playerNameInput.value.trim();
+
+  if (!name) {
+    if (playerNameStatus) {
+      playerNameStatus.textContent =
+        "プレイヤー名を入力してください。";
+    }
+    return;
+  }
+
+  try {
+    localStorage.setItem(PLAYER_NAME_KEY, name);
+
+    if (playerNameStatus) {
+      playerNameStatus.textContent =
+        `「${name}」を保存しました。`;
+    }
+  } catch (error) {
+    console.error("プレイヤー名を保存できませんでした。", error);
+
+    if (playerNameStatus) {
+      playerNameStatus.textContent =
+        "保存できませんでした。";
+    }
+  }
+}
+
+
+/* 設定画面に保存済みの名前を表示 */
+if (playerNameInput) {
+  playerNameInput.value = loadPlayerName();
+}
+
+if (savePlayerNameButton) {
+  savePlayerNameButton.addEventListener(
+    "click",
+    savePlayerName
+  );
+}
+
+
+/* =========================================================
    効果音設定画面
 ========================================================= */
 
@@ -4540,7 +5119,13 @@ async function passBattleTurn() {
 
 
 function showBattleResult(winnerIndex, reason) {
+  // すでに結果画面へ移行済みなら二重記録しない
+  if (!battleGame.inProgress) return;
+
   battleGame.inProgress = false;
+
+  // 対戦成績を記録
+  recordBattleStats(winnerIndex);
 
   const battleScreen = document.getElementById("battle-test-screen");
   const resultScreen = document.getElementById("battle-result-screen");
@@ -4718,3 +5303,120 @@ updateDailyDisplay();
 updateMenuTodaySummary();
 
 showScreen("menu");
+
+
+
+/* =========================================================
+   2人対戦の通算成績
+========================================================= */
+
+const BATTLE_STATS_KEY = "tashite10_battle_stats";
+
+function loadBattleStats() {
+  const emptyStats = {
+    p1Wins: 0,
+    p1Losses: 0,
+    p1Draws: 0,
+    p2Wins: 0,
+    p2Losses: 0,
+    p2Draws: 0
+  };
+
+  try {
+    const saved = localStorage.getItem(BATTLE_STATS_KEY);
+
+    if (!saved) {
+      return { ...emptyStats };
+    }
+
+    const parsed = JSON.parse(saved);
+
+    for (const key of Object.keys(emptyStats)) {
+      if (
+        typeof parsed[key] !== "number" ||
+        !Number.isFinite(parsed[key]) ||
+        parsed[key] < 0
+      ) {
+        parsed[key] = 0;
+      }
+    }
+
+    return { ...emptyStats, ...parsed };
+  } catch (error) {
+    console.error("対戦成績を読み込めませんでした。", error);
+    return { ...emptyStats };
+  }
+}
+
+function saveBattleStats(stats) {
+  try {
+    localStorage.setItem(BATTLE_STATS_KEY, JSON.stringify(stats));
+  } catch (error) {
+    console.error("対戦成績を保存できませんでした。", error);
+  }
+}
+
+function renderBattleStats() {
+  const stats = loadBattleStats();
+
+  const values = {
+    "battle-stats-p1-wins": stats.p1Wins,
+    "battle-stats-p1-losses": stats.p1Losses,
+    "battle-stats-p1-draws": stats.p1Draws,
+    "battle-stats-p2-wins": stats.p2Wins,
+    "battle-stats-p2-losses": stats.p2Losses,
+    "battle-stats-p2-draws": stats.p2Draws
+  };
+
+  for (const [id, value] of Object.entries(values)) {
+    const element = document.getElementById(id);
+    if (element) {
+      element.textContent = value;
+    }
+  }
+
+  const p1Games = stats.p1Wins + stats.p1Losses;
+  const p2Games = stats.p2Wins + stats.p2Losses;
+
+  const p1Rate = document.getElementById("battle-stats-p1-rate");
+  const p2Rate = document.getElementById("battle-stats-p2-rate");
+
+  if (p1Rate) {
+    p1Rate.textContent =
+      p1Games > 0
+        ? `${Math.round(stats.p1Wins / p1Games * 100)}%`
+        : "—";
+  }
+
+  if (p2Rate) {
+    p2Rate.textContent =
+      p2Games > 0
+        ? `${Math.round(stats.p2Wins / p2Games * 100)}%`
+        : "—";
+  }
+}
+
+/* 対戦結果を1回だけ記録 */
+function recordBattleStats(winnerIndex) {
+  const stats = loadBattleStats();
+
+  if (winnerIndex === null) {
+    stats.p1Draws++;
+    stats.p2Draws++;
+  } else if (winnerIndex === 0) {
+    stats.p1Wins++;
+    stats.p2Losses++;
+  } else if (winnerIndex === 1) {
+    stats.p2Wins++;
+    stats.p1Losses++;
+  } else {
+    return;
+  }
+
+  saveBattleStats(stats);
+  renderBattleStats();
+}
+
+/* メニュー初期表示時にも保存済み成績を表示 */
+renderBattleStats();
+
