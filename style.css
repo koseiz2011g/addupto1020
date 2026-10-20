@@ -3001,6 +3001,79 @@ h1 {
 }
 
 
+/* 2人対戦メニュー：通算成績 */
+#versus-menu-screen .versus-menu-stats {
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px 6px;
+  box-sizing: border-box;
+  border-radius: 10px;
+  background: #f3f6fa;
+  color: #263445;
+  text-align: center;
+}
+
+#versus-menu-screen .versus-menu-stats-title {
+  margin-bottom: 8px;
+  font-size: clamp(12px, 1.4vw, 16px);
+  font-weight: 700;
+}
+
+#versus-menu-screen .versus-menu-record {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 10px;
+  font-size: clamp(11px, 1.3vw, 15px);
+}
+
+#versus-menu-screen .versus-menu-record span {
+  white-space: nowrap;
+}
+
+#versus-menu-screen .versus-menu-winrate {
+  margin-top: 8px;
+  font-size: clamp(13px, 1.5vw, 17px);
+}
+
+#versus-menu-screen .versus-menu-winrate strong {
+  font-size: 1.2em;
+}
+
+/* 先攻・後攻の色を成績にも反映 */
+#versus-menu-screen .player1 .versus-menu-stats {
+  border: 1px solid #b9d0ef;
+}
+
+#versus-menu-screen .player2 .versus-menu-stats {
+  border: 1px solid #edc2c2;
+}
+
+/* スマートフォン縦画面 */
+@media (max-width: 600px) and (orientation: portrait) {
+  #versus-menu-screen .versus-menu-stats {
+    margin-top: 6px;
+    padding: 8px 3px;
+  }
+
+  #versus-menu-screen .versus-menu-stats-title {
+    font-size: 12px;
+  }
+
+  #versus-menu-screen .versus-menu-record {
+    gap: 4px 6px;
+    font-size: 11px;
+  }
+
+  #versus-menu-screen .versus-menu-winrate {
+    margin-top: 5px;
+    font-size: 13px;
+  }
+}
+
+
+
+
 
 
 
