@@ -32,6 +32,10 @@
     </div>
   </div>
 
+  <button id="competition-button" type="button" class="main-button">
+  みんなで競争
+</button>
+
   <button id="versus-button" class="main-button">
     2人で対戦する
   </button>
@@ -101,6 +105,65 @@
     メニューへ
   </button>
 </div>
+
+</section>
+
+
+<!-- みんなで競争 -->
+<section id="competition-menu-screen" class="screen hidden">
+
+  <h2>みんなで競争</h2>
+
+  <p>同じコードを使って、同じカード順で遊びます。</p>
+
+  <button id="competition-create-button" type="button">
+    コードを作成
+  </button>
+
+  <button id="competition-enter-button" type="button">
+    コードを入力
+  </button>
+
+  <!-- 作成したコードの表示 -->
+  <div id="competition-created-area" hidden>
+    <p>みんなにこのコードを伝えてください。</p>
+
+    <p id="competition-created-code"></p>
+
+    <button id="competition-copy-button" type="button">
+      コードをコピー
+    </button>
+  </div>
+
+  <!-- 参加コードの入力 -->
+  <div id="competition-enter-area" hidden>
+    <label for="competition-code-input">
+      受け取ったコード
+    </label>
+
+    <input
+      id="competition-code-input"
+      type="text"
+      maxlength="6"
+      placeholder="例：K7M2Q9"
+      autocomplete="off"
+      autocapitalize="characters"
+    >
+
+    <button id="competition-check-button" type="button">
+      コードを確認
+    </button>
+  </div>
+
+  <p id="competition-status" aria-live="polite"></p>
+
+  <button id="competition-start-button" type="button" hidden>
+  ゲーム開始
+</button>
+
+  <button id="competition-menu-back-button" type="button">
+    メインメニューへ戻る
+  </button>
 
 </section>
 
@@ -204,6 +267,19 @@
     <div class="versus-menu-player player1">
       <h3>プレイヤー1</h3>
       <div class="versus-menu-icon">🧑</div>
+
+      <div class="versus-menu-stats">
+  <div class="versus-menu-stats-title">通算成績（先攻）</div>
+  <div class="versus-menu-record">
+    <span>勝ち <strong id="battle-stats-p1-wins">0</strong></span>
+    <span>負け <strong id="battle-stats-p1-losses">0</strong></span>
+    <span>引き分け <strong id="battle-stats-p1-draws">0</strong></span>
+  </div>
+  <div class="versus-menu-winrate">
+    勝率 <strong id="battle-stats-p1-rate">—</strong>
+  </div>
+</div>
+
     </div>
 
     <!-- 中央：タイトル・説明・ボタン -->
@@ -227,6 +303,19 @@
     <div class="versus-menu-player player2">
       <h3>プレイヤー2</h3>
       <div class="versus-menu-icon">🧑</div>
+
+      <div class="versus-menu-stats">
+  <div class="versus-menu-stats-title">通算成績（後攻）</div>
+  <div class="versus-menu-record">
+    <span>勝ち <strong id="battle-stats-p2-wins">0</strong></span>
+    <span>負け <strong id="battle-stats-p2-losses">0</strong></span>
+    <span>引き分け <strong id="battle-stats-p2-draws">0</strong></span>
+  </div>
+  <div class="versus-menu-winrate">
+    勝率 <strong id="battle-stats-p2-rate">—</strong>
+  </div>
+</div>
+
     </div>
 
   </div>
@@ -466,14 +555,19 @@
 
       </div>
 
-      <div class="battle-result-bottom-buttons">
-        <button id="battle-result-menu" class="battle-result-button">
-          メニューへ
-        </button>
-        <button id="battle-result-replay" class="battle-result-button">
-          もう一度対戦
-        </button>
-      </div>
+      
+<div class="battle-result-bottom-buttons">
+  <button id="battle-result-menu" class="battle-result-button">
+    メニューへ
+  </button>
+  <button id="battle-result-versus-menu" class="battle-result-button">
+    対戦メニューへ
+  </button>
+  <button id="battle-result-replay" class="battle-result-button">
+    もう一度対戦
+  </button>
+</div>
+
     </div>
 
     <!-- 右：プレイヤー2 -->
@@ -739,29 +833,35 @@
 
   </div>
 
-  <!-- 本日の記録 -->
-  <div class="records-content">
 
-    <div>
-      本日の挑戦
-      <strong id="records-challenge">0</strong>回
-    </div>
+ 
+<!-- みんなで競争の記録 -->
+<div class="competition-records-section">
+  <h3>みんなで競争の記録</h3>
+  <p>これまでに保存した競争結果です。</p>
+  
+<div class="competition-records-filter">
+  <label for="competition-records-code-filter">
+    競争コードで絞り込む
+  </label>
+  <select id="competition-records-code-filter">
+    <option value="">すべてのコード</option>
+  </select>
+</div>
 
-    <div>
-      本日の勝利
-      <strong id="records-wins">0</strong>勝
-    </div>
+<div id="competition-records-list">
+  <p>記録を読み込んでいます。</p>
+</div>
 
-    <div>
-      本日の敗北
-      <strong id="records-losses">0</strong>敗
-    </div>
+</div>
 
-  </div>
+
 
   <button id="records-back-button" class="sub-button">
     戻る
   </button>
+
+ 
 
 </section>
 
@@ -770,6 +870,27 @@
 <section id="settings-screen" class="screen">
 
   <h1>設定</h1>
+
+  <!-- プレイヤー名設定 -->
+<div class="player-name-setting">
+  <label for="player-name-input">
+    みんなで競争：プレイヤー名
+  </label>
+
+  <input
+    type="text"
+    id="player-name-input"
+    maxlength="20"
+    placeholder="プレイヤー名を入力"
+    autocomplete="nickname"
+  >
+
+  <button id="save-player-name-button" type="button">
+    名前を保存
+  </button>
+
+  <p id="player-name-status" aria-live="polite"></p>
+</div>
 
   <div class="settings-content">
 
