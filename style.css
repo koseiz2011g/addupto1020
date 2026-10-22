@@ -3072,9 +3072,292 @@ h1 {
 }
 
 
+/* みんなで競争の記録：表の表示 */
+.competition-table-wrap {
+  width: 100%;
+  max-width: 100%;
+  margin-top: 12px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 記録一覧の表 */
+.competition-records-table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+  font-size: 14px;
+  line-height: 1.5;
+  background: #ffffff;
+}
+
+/* 見出しと各セル */
+.competition-records-table th,
+.competition-records-table td {
+  border: 1px solid #d6dce5;
+  padding: 9px 10px;
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* 見出し行 */
+.competition-records-table thead th {
+  background: #eef3f8;
+  color: #263445;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* データ行を交互に薄く色分け */
+.competition-records-table tbody tr:nth-child(even) {
+  background: #f7f9fc;
+}
+
+/* 順位 */
+.competition-records-table .rank-cell {
+  text-align: center;
+  font-weight: 700;
+}
+
+/* スコア・ターン数 */
+.competition-records-table .score-cell,
+.competition-records-table .turn-cell {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* コピー操作 */
+.competition-records-table .copy-cell {
+  text-align: center;
+}
+
+.competition-records-table .copy-button {
+  padding: 7px 10px;
+  margin: 0;
+  white-space: nowrap;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* 記録一覧の説明文 */
+.competition-records-section > p {
+  margin-bottom: 10px;
+}
+
+/* スマートフォンでは表を横スクロール */
+@media (max-width: 600px) {
+  .competition-records-table {
+    font-size: 13px;
+  }
+
+  .competition-records-table th,
+  .competition-records-table td {
+    padding: 8px;
+  }
+}
 
 
+/* 競争記録の表：横スクロールを確実に有効にする */
+#competition-records-list {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+#competition-records-list .competition-table-wrap {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
+}
+
+#competition-records-list .competition-records-table {
+  width: max-content;
+  min-width: 760px;
+  max-width: none;
+  table-layout: auto;
+  border-collapse: collapse;
+}
+
+#competition-records-list .competition-records-table th,
+#competition-records-list .competition-records-table td {
+  white-space: nowrap;
+}
 
 
+/* 競争記録の横スクロールを修正 */
+#competition-records-list {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: visible;
+}
 
+#competition-records-list .competition-table-wrap {
+  display: block;
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: scroll !important;
+  overflow-y: hidden;
+  box-sizing: border-box;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
+
+#competition-records-list .competition-records-table {
+  width: max-content !important;
+  min-width: 760px !important;
+  max-width: none !important;
+  table-layout: auto;
+}
+
+#competition-records-list .competition-records-table th,
+#competition-records-list .competition-records-table td {
+  white-space: nowrap;
+}
+
+
+/* 競争記録：スマートフォン向け2段表示 */
+#competition-records-list .competition-table-wrap {
+  width: 100%;
+  max-width: 100%;
+  overflow: visible !important;
+}
+
+#competition-records-list .competition-records-table {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+#competition-records-list .competition-records-table th,
+#competition-records-list .competition-records-table td {
+  padding: 6px 4px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  box-sizing: border-box;
+}
+
+#competition-records-list .competition-records-table th {
+  font-size: 12px;
+  text-align: center;
+}
+
+#competition-records-list .competition-records-table .rank-cell {
+  width: 12%;
+  text-align: center;
+}
+
+#competition-records-list .competition-records-table .score-cell {
+  text-align: right;
+  white-space: nowrap;
+}
+
+#competition-records-list .competition-records-table .turn-cell {
+  text-align: center;
+  white-space: nowrap;
+}
+
+#competition-records-list .competition-record-detail-row td {
+  background: #f7f9fc;
+  border-top: 0;
+}
+
+#competition-records-list .competition-detail-cell {
+  padding: 5px 8px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+#competition-records-list .competition-record-date {
+  display: inline-block;
+  margin-right: 8px;
+  overflow-wrap: anywhere;
+  color: #555;
+}
+
+#competition-records-list .competition-records-table .copy-button {
+  display: inline-block;
+  padding: 4px 7px;
+  margin: 3px 0;
+  font-size: 11px;
+  white-space: normal;
+}
+
+@media (max-width: 400px) {
+  #competition-records-list .competition-records-table {
+    font-size: 12px;
+  }
+
+  #competition-records-list .competition-records-table th,
+  #competition-records-list .competition-records-table td {
+    padding: 5px 3px;
+  }
+
+  #competition-records-list .competition-detail-cell {
+    font-size: 10px;
+  }
+}
+
+
+/* 競争記録：各列の幅と文字配置を調整 */
+#competition-records-list .competition-records-table {
+  table-layout: fixed;
+  width: 100% !important;
+}
+
+/* 1列目：順位 */
+#competition-records-list .competition-records-table th:nth-child(1),
+#competition-records-list .competition-records-table td:nth-child(1) {
+  width: 12%;
+}
+
+/* 2列目：プレイヤー名を広く */
+#competition-records-list .competition-records-table th:nth-child(2),
+#competition-records-list .competition-records-table td:nth-child(2) {
+  width: 32%;
+}
+
+/* 3列目：コード */
+#competition-records-list .competition-records-table th:nth-child(3),
+#competition-records-list .competition-records-table td:nth-child(3) {
+  width: 20%;
+}
+
+/* 4列目：スコア */
+#competition-records-list .competition-records-table th:nth-child(4),
+#competition-records-list .competition-records-table td:nth-child(4) {
+  width: 20%;
+}
+
+/* 5列目：ターン数を狭く */
+#competition-records-list .competition-records-table th:nth-child(5),
+#competition-records-list .competition-records-table td:nth-child(5) {
+  width: 16%;
+}
+
+/* 5つのセルの中身を中央揃え */
+#competition-records-list .competition-records-table th,
+#competition-records-list .competition-records-table td {
+  text-align: center;
+  vertical-align: middle;
+  overflow-wrap: anywhere;
+}
+
+/* スコアも中央揃えに統一 */
+#competition-records-list .competition-records-table .score-cell,
+#competition-records-list .competition-records-table .turn-cell,
+#competition-records-list .competition-records-table .rank-cell {
+  text-align: center;
+}
 
