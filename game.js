@@ -1326,142 +1326,197 @@ function updateRecordsDisplay() {
    みんなで競争：記録一覧を表示
 ========================================================= */
 
+
+
 function updateCompetitionRecordsDisplay() {
-  const list = document.getElementById("competition-records-list");
+  const storageKey = "tashite10or20_competition_results";
   const filter = document.getElementById(
     "competition-records-code-filter"
   );
+  const list = document.getElementById(
+    "competition-records-list"
+  );
 
-  if (!list) return;
+  if (!filter || !list) return;
 
-  let results = [];
+  let records = [];
 
   try {
-    const saved = localStorage.getItem(
-      "tashite10or20_competition_results"
+    records = JSON.parse(
+      localStorage.getItem(storageKey) || "[]"
     );
 
-    results = saved ? JSON.parse(saved) : [];
-
-    if (!Array.isArray(results)) {
-      results = [];
-    }
+    if (!Array.isArray(records)) records = [];
   } catch (error) {
-    console.error("競争記録を読み込めませんでした。", error);
-    results = [];
+    records = [];
   }
 
-  // 保存済み記録からコード一覧を作成
-  const codes = [...new Set(
-    results
-      .map(result => result.code)
-      .filter(code => typeof code === "string" && code)
-  )];
-
-  // 選択中のコードを保持
-  const selectedCode = filter ? filter.value : "";
-
-  if (filter) {
-    filter.replaceChildren();
-
-    const allOption = document.createElement("option");
-    allOption.value = "";
-    allOption.textContent = "すべてのコード";
-    filter.appendChild(allOption);
-
-    codes.forEach(code => {
-      const option = document.createElement("option");
-      option.value = code;
-      option.textContent = code;
-      filter.appendChild(option);
-    });
-
-    filter.value = codes.includes(selectedCode) ? selectedCode : "";
+  function getRecordTime(record) {
+    const time = new Date(record.dateTime || "").getTime();
+    return Number.isFinite(time) ? time : 0;
   }
 
-  // 選択したコードで絞り込む
-  const activeCode = filter ? filter.value : "";
+  const latestByCode = new Map();
 
-  if (activeCode) {
-    results = results.filter(result => result.code === activeCode);
-  }
+  records.forEach(record => {
+    const code = record.code || "不明";
+    const time = getRecordTime(record);
 
-  // スコアの高い順。同点なら新しい記録を先にする
-  results = results
-    .map((result, index) => ({ ...result, _originalIndex: index }))
-    .sort((a, b) => {
-      const scoreDifference =
-        (Number(b.score) || 0) - (Number(a.score) || 0);
+    if (!latestByCode.has(code) || time > latestByCode.get(code)) {
+      latestByCode.set(code, time);
+    }
+  });
 
-      return scoreDifference !== 0
-        ? scoreDifference
-        : b._originalIndex - a._originalIndex;
-    });
+  const previousCode = filter.value;
+  const codes = [...latestByCode.keys()].sort(
+    (a, b) => latestByCode.get(b) - latestByCode.get(a)
+  );
 
-  if (results.length === 0) {
-    list.textContent = activeCode
-      ? "このコードの記録はありません。"
-      : "まだ競争記録がありません。";
-    return;
+  filter.replaceChildren();
+
+  const allOption = document.createElement("option");
+  allOption.value = "";
+  allOption.textContent = "すべてのコード";
+  filter.appendChild(allOption);
+
+  codes.forEach(code => {
+    const option = document.createElement("option");
+    option.value = code;
+    option.textContent = code;
+    filter.appendChild(option);
+  });
+
+  filter.value = codes.includes(previousCode) ? previousCode : "";
+
+  const selectedCode = filter.value;
+  let displayedRecords;
+
+  if (selectedCode) {
+    displayedRecords = records
+      .filter(record => (record.code || "不明") === selectedCode)
+      .sort((a, b) => {
+        const scoreDiff =
+          (Number(b.score) || 0) - (Number(a.score) || 0);
+        return scoreDiff || getRecordTime(a) - getRecordTime(b);
+      });
+  } else {
+    displayedRecords = [...records]
+      .sort((a, b) => getRecordTime(b) - getRecordTime(a))
+      .slice(0, 5);
   }
 
   list.replaceChildren();
 
-  
-results.forEach((result, index) => {
-  const item = document.createElement("div");
-  item.className = "competition-record-item";
+  if (displayedRecords.length === 0) {
+    const message = document.createElement("p");
+    message.textContent = "表示できる記録はありません。";
+    list.appendChild(message);
+    return;
+  }
 
-  const heading = document.createElement("h4");
-  heading.textContent =
-    `${index + 1}. ${result.name || "名前未設定"}`;
+  // 表を作成
+  const wrapper = document.createElement("div");
+  wrapper.className = "competition-table-wrap";
 
-  const details = document.createElement("p");
-  details.textContent =
-    `コード：${result.code || "不明"} ／ ` +
-    `スコア：${Number(result.score) || 0}点`;
+  const table = document.createElement("table");
+  table.className = "competition-records-table";
 
-  const date = document.createElement("p");
-  date.textContent =
-    `ターン数：${Number(result.turn) || 0} ／ ` +
-    `日時：${result.dateTime || "不明"}`;
+  const thead = document.createElement("thead");
+  const headerRow = document.createElement("tr");
 
-  const copyButton = document.createElement("button");
-  copyButton.type = "button";
-  copyButton.textContent = "結果をコピー";
-
-  const copyStatus = document.createElement("p");
-  copyStatus.setAttribute("aria-live", "polite");
-
-  copyButton.addEventListener("click", async () => {
-    const shareText = [
-      "【たして10か20・競争結果】",
-      `プレイヤー：${result.name || "名前未設定"}`,
-      `コード：${result.code || "不明"}`,
-      `スコア：${Number(result.score) || 0}点`,
-      `ターン数：${Number(result.turn) || 0}`,
-      `日時：${result.dateTime || "不明"}`
-    ].join("\n");
-
-    try {
-      await navigator.clipboard.writeText(shareText);
-      copyStatus.textContent = "コピーしました。LINEなどに貼り付けできます。";
-    } catch (error) {
-      copyStatus.textContent =
-        "コピーできませんでした。HTTPS接続で開いているか確認してください。";
-    }
+  ["順位", "プレイヤー", "コード", "スコア", "ターン数"].forEach(text => {
+    const th = document.createElement("th");
+    th.textContent = text;
+    th.scope = "col";
+    headerRow.appendChild(th);
   });
 
-  item.append(heading, details, date, copyButton, copyStatus);
-  list.appendChild(item);
-});
+  thead.appendChild(headerRow);
+  table.appendChild(thead);
 
+  const tbody = document.createElement("tbody");
+
+  displayedRecords.forEach((record, index) => {
+    // 1行目：基本情報
+    const row = document.createElement("tr");
+    row.className = "competition-record-main-row";
+
+    const rankCell = document.createElement("td");
+    rankCell.className = "rank-cell";
+    rankCell.textContent = selectedCode ? `${index + 1}位` : `${index + 1}`;
+    row.appendChild(rankCell);
+
+    const nameCell = document.createElement("td");
+    nameCell.textContent = record.name || "名前未設定";
+    row.appendChild(nameCell);
+
+    const codeCell = document.createElement("td");
+    codeCell.textContent = record.code || "不明";
+    row.appendChild(codeCell);
+
+    const scoreCell = document.createElement("td");
+    scoreCell.className = "score-cell";
+    scoreCell.textContent = `${Number(record.score) || 0}点`;
+    row.appendChild(scoreCell);
+
+    const turnCell = document.createElement("td");
+    turnCell.className = "turn-cell";
+    turnCell.textContent = `${Number(record.turn) || 0}`;
+    row.appendChild(turnCell);
+
+    tbody.appendChild(row);
+
+    // 2行目：日時とコピー操作
+    const detailRow = document.createElement("tr");
+    detailRow.className = "competition-record-detail-row";
+
+    const detailCell = document.createElement("td");
+    detailCell.colSpan = 5;
+    detailCell.className = "competition-detail-cell";
+
+    const dateText = document.createElement("span");
+    dateText.className = "competition-record-date";
+    dateText.textContent = `日時：${record.dateTime || "日時不明"}`;
+    detailCell.appendChild(dateText);
+
+    const copyButton = document.createElement("button");
+    copyButton.type = "button";
+    copyButton.className = "copy-button";
+    copyButton.textContent = "結果をコピー";
+
+    copyButton.addEventListener("click", async () => {
+      const shareText = [
+        "【たして10か20・競争結果】",
+        `プレイヤー：${record.name || "名前未設定"}`,
+        `コード：${record.code || "不明"}`,
+        `スコア：${Number(record.score) || 0}点`,
+        `ターン数：${Number(record.turn) || 0}`,
+        `日時：${record.dateTime || "不明"}`
+      ].join("\n");
+
+      try {
+        await navigator.clipboard.writeText(shareText);
+        copyButton.textContent = "コピーしました";
+      } catch (error) {
+        copyButton.textContent = "コピーできませんでした";
+      }
+    });
+
+    detailCell.appendChild(copyButton);
+    detailRow.appendChild(detailCell);
+    tbody.appendChild(detailRow);
+  });
+
+  table.appendChild(tbody);
+  wrapper.appendChild(table);
+  list.appendChild(wrapper);
 }
 
-// コードを変更したら一覧を更新
+// コードを選び直したら表示を更新
 document
   .getElementById("competition-records-code-filter")
   ?.addEventListener("change", updateCompetitionRecordsDisplay);
+
 
 
 
@@ -5419,4 +5474,3 @@ function recordBattleStats(winnerIndex) {
 
 /* メニュー初期表示時にも保存済み成績を表示 */
 renderBattleStats();
-
